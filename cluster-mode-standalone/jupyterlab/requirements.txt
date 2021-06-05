@@ -1,0 +1,8 @@
+wheel
+wget
+pyspark
+jupyterlab
+numpy
+pandas
+pyarrow
+beautifulsoup4
