@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "spark-container-testing",
+  "private_key_id": "68ee0abb51b13fd4886a3f201f3f12128ff2a086",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDDHMylBQlrqEZC\nsZz4lIX4GvG5q8ZUQrmxv9J7D3i9fV3Ey5Me84lcAmwuUdCdCBntRBC7OCfTWV98\ngD0YXO7fOH2mbm8EsKpMkpsE9y8Ij2x1CW+SN4vVT9bv/3WR9MblL1s7lYStwuTB\nzazWXumTVR71wCMdOL+NzxLcKjt67iD8BEM3TiKxzjtTZSu37swTFfHBDFsrzjt/\nMxQ/nISLpYyMHG11mosdAtftCJ66lCbbCwA9Ot8Yep+bJlXfsJFsvzjwmGkqcsgW\nDWlKFhT0N4Wq+/XTWBeF1ap/Idjl4HBkaarh16jSCU8yK9aSlUh654dwsCZcz5MO\nk8NB3C6jAgMBAAECggEAXS1IN7hnjs+uOhR7K6U2M02eybYUQVIaPx4lxNoXJZsU\nqDI2AK56FwQbKKWutAdV5l6+hMIlFsQUGy9cveFHvDdMnioX/4vk0CulN2JaRkLE\nH0JR02iOcWCu+y8qtPjJ8VJDxfk6AwdTWpA/7aIm9tLMNb07p61doTnWPmk2vZXa\nux/vw73vz1nRH7uY8b3dSlr9NklFsVJwRUr+EQXbWXy9Z0Ww3VegP+UZFhhwSt9P\nKE8blT6UAz1bVVnlR+0bA1t4K9dz97Gmb72FWfePtKF6oHvTzBmqk/qpAgbgohyg\nDf4RYSItBglyqLAcKJfkcBmwUKNekxtK2YmAq8DooQKBgQD/EzMzqvOhZBSenAql\nbAr6YpoP3PUhu4BDc/292Oai6B/a5DUgA5rY1QdSDhuTFokOJkiMrOpuXBK62dWQ\n9B8QjBHH4usFle0UygLl7srwg7HcYe0myzZm6axnas+iT0dE5KLpMJMu1V1yr6YT\ntfglRjLAtICVjxZbh6yDKDqy4QKBgQDD0e7Ux9u1iCm1kcZd3LC1dLBh5Amlfnyi\n/aHYPlhN2gOHgae0jGkkfge+TNBsB8WaSB/kPySZkeGfDR8yJLY1sP2jUHdvHLYK\nYbaS2lfmq4L6+I8bZZRRHtxL51J7Wp6Zi8qKa+VogF3fJpcUHa2COERvSviNXk5+\njj3ZkCTWAwKBgQCe3OVpy5H7NWrGMidLSdQ4h4quUI53mODUofwp7loOogWc/b68\nlqItY9gwWcsAu+tWXa+XteY4H64mo58orXJfiu1UEdcQXoUPCpXtgODyFQOEX5Ul\nMTFLvUN8EYEJ9NhNZxyzoWY5p/eQgycrZY0MIgFgFctz2m8xSHnAIiEU4QKBgBu/\nuQ9wDuNnmzl+odSVPHlKQuBsVy2bgf/63x9snkjR9yQRrHk6WH/yWBiQfAyDAW5+\nf/5xMDeO46ENU/lgGG39WcP12Cbns6g+9odS55fpgBMee/EO8PiZ3e/npNmUGtt5\nYsdAyO6JGkRQDKKuHfNRE+mNfzFRRuBKOduFwKKPAoGBAIGU/wg3pdEjRc2Skgs3\n1ywuQnXDXR7z+iE3LsrLOJFaqrrkbWhugSiivKmQaAvK9XP0+lQGucaAiFn3uv1e\n0PcAMmRflDQo3D3nb67BOqrvknho9xy4HPikJt43qbXARZ37SikpywfeUaFgd6WQ\nkgFoLYqG1AGthgJiV1MVuvSO\n-----END PRIVATE KEY-----\n",
+  "client_email": "deployer-sa@spark-container-testing.iam.gserviceaccount.com",
+  "client_id": "105253266132182877359",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/deployer-sa%40spark-container-testing.iam.gserviceaccount.com"
+}

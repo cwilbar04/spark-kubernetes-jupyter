@@ -15,7 +15,9 @@ RUN mkdir -p ${shared_workspace}/data && \
     ca-certificates-java && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV SHARED_WORKSPACE=${shared_workspace}
+ENV SHARED_WORKSPACE=${shared_workspace} \
+    JAVA_HOME=/usr/lib/jvm/java-${openjdk_version}-openjdk-amd64 \
+    PATH=$JAVA_HOME/bin:$PATH
 
 VOLUME ${shared_workspace}
 
