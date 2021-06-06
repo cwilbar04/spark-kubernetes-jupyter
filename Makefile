@@ -24,8 +24,6 @@ cluster_standalone_build:
 	docker build -t base cluster-mode-standalone\base
 	docker build -t jupyterlab cluster-mode-standalone\jupyterlab
 	docker build -t spark-base cluster-mode-standalone\spark-base
-	docker build -t spark-master cluster-mode-standalone\spark-master
-	docker build -t spark-worker cluster-mode-standalone\spark-worker
 
 cluster_standalone_push:
 	docker tag base:latest gcr.io/${GOOGLE_CLOUD_PROJECT}/spark-cluster-base:latest
@@ -46,5 +44,10 @@ jupyter_deploy:
 	docker build -t jupyterlab cluster-mode-standalone\jupyterlab
 	docker tag jupyterlab:latest gcr.io/${GOOGLE_CLOUD_PROJECT}/spark-cluster-jupyterlab:latest
 	docker push gcr.io/${GOOGLE_CLOUD_PROJECT}/spark-cluster-jupyterlab:latest
+
+spark_deploy:
+	docker build -t spark-base cluster-mode-standalone\spark-base
+	docker tag spark-base:latest gcr.io/${GOOGLE_CLOUD_PROJECT}/spark-cluster-spark-base:latest
+	docker push gcr.io/${GOOGLE_CLOUD_PROJECT}/spark-cluster-spark-base:latest
 	
 all: install lint test
