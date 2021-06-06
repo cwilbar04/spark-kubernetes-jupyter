@@ -23,8 +23,8 @@ RUN pip3 install --upgrade pip && \
     pip3 install -r requirements.txt && \
     jupyter lab clean 
 
-COPY starter-notebook.ipynb starter-notebook.ipynb
+COPY starter-notebook.ipynb ${SHARED_WORKSPACE}/starter-notebook.ipynb
 
 WORKDIR ${SHARED_WORKSPACE}
-ENTRYPOINT ["jupyter","lab","--ip=0.0.0.0","--port=8888","--no-browser","--allow-root","--NotebookApp.token="]
-# CMD [jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=]
+# ENTRYPOINT ["jupyter","lab","--ip=0.0.0.0","--port=8888","--no-browser","--allow-root","--NotebookApp.token="]
+CMD jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=
