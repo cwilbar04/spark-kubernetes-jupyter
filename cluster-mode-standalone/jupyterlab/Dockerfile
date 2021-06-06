@@ -1,4 +1,4 @@
-FROM spark-base
+FROM base
 
 EXPOSE 8888
 
