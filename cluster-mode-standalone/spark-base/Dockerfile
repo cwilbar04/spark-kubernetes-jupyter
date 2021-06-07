@@ -39,6 +39,5 @@ RUN cp $SPARK_HOME/conf/spark-defaults.conf.template $SPARK_HOME/conf/spark-defa
     echo spark.hadoop.fs.gs.AbstractFilePath.impl     com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS >> spark-defaults.conf
 
 WORKDIR ${SPARK_HOME}
-COPY entrypoint.sh /opt/entrypoint.sh
 
-ENTRYPOINT [ "/opt/entrypoint.sh" ]
+ENTRYPOINT [ "CMD" ]
