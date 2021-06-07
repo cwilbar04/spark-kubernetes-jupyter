@@ -40,4 +40,4 @@ RUN cp $SPARK_HOME/conf/spark-defaults.conf.template $SPARK_HOME/conf/spark-defa
 
 WORKDIR ${SPARK_HOME}
 
-ENTRYPOINT [ "CMD" ]
+ENTRYPOINT ["tini", "-g", "--"]
