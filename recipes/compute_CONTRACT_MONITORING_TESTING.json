@@ -1,0 +1,108 @@
+{
+  "type": "sql_script",
+  "neverRecomputeExistingPartitions": false,
+  "optionalDependencies": false,
+  "params": {
+    "allowMultipleConnections": false,
+    "usePsql": true,
+    "inferOutputDatasetsSchema": true,
+    "statementsParsingMode": "SPLIT",
+    "skipPrerunValidate": false
+  },
+  "customMeta": {
+    "kv": {}
+  },
+  "redispatchPartitioning": false,
+  "maxRunningActivities": 0,
+  "inputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "CODE_TABLE",
+          "deps": []
+        },
+        {
+          "ref": "radardm_prod_provider",
+          "deps": []
+        },
+        {
+          "ref": "MBR",
+          "deps": []
+        },
+        {
+          "ref": "il_visit_cat",
+          "deps": []
+        },
+        {
+          "ref": "ACCT",
+          "deps": []
+        },
+        {
+          "ref": "dsl_code_table",
+          "deps": []
+        },
+        {
+          "ref": "ADDR",
+          "deps": []
+        },
+        {
+          "ref": "CLM_DRG",
+          "deps": []
+        },
+        {
+          "ref": "MBR_ADDR",
+          "deps": []
+        },
+        {
+          "ref": "POSTL_REFR",
+          "deps": []
+        },
+        {
+          "ref": "radardm_prod_claim",
+          "deps": []
+        },
+        {
+          "ref": "radardm_prod_claim_line",
+          "deps": []
+        },
+        {
+          "ref": "SG_CCS",
+          "deps": []
+        },
+        {
+          "ref": "il_visit",
+          "deps": []
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "CONTRACT_MONITORING_TESTING",
+          "appendMode": false
+        }
+      ]
+    }
+  },
+  "versionTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628006967615
+  },
+  "creationTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628006967615
+  },
+  "tags": [],
+  "customFields": {},
+  "checklists": {
+    "checklists": []
+  }
+}
