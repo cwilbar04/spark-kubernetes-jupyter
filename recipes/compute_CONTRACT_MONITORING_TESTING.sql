@@ -1,26 +1,28 @@
-CREATE VIEW IL_CONTRACT_MONITORING 
+CREATE MULTISET TABLE ${CONTRACT_MONITORING_TESTING}
+AS(
 SELECT
+    concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY"
 --- Base RADAR tables ---
-	ck.dw_clm_key
+	,ck.dw_clm_key
 	, ck.provider_payee_name
 	, ck.dw_mbr_key
 	, ck.incurd_dt
 	
 	, clm_li.Li_num
 	, clm_li.HCPCS_CPT_Cd
-	, cpt_code.code_txt as HCPCS_CPT_Code_Desc -- from clm_li.hcpcs_cpt_cd
-	, rvcode.code_txt as RevCD_Desc -- from clm_li.rvnu_cd Code in Tableau defaults to this when HCPCS Code is Null. Can we move the logic here with generic column name? That way we can group by here for aggregation with less columns. Why is the CPT Code description ever NULL in the first place?	
+	, cpt_code.code_txt as "HCPCS_CPT_Code_Desc" -- from clm_li.hcpcs_cpt_cd
+	, rvcode.code_txt as "RevCD_Desc" -- from clm_li.rvnu_cd Code in Tableau defaults to this when HCPCS Code is Null. Can we move the logic here with generic column name? That way we can group by here for aggregation with less columns. Why is the CPT Code description ever NULL in the first place?	
 	
 	
 	, clm_li.rvnu_cd
 	, clm_li.prov_alwd_amt
-	, clm_li.Svc_From_Dt-clm_li.Svc_To_Dt as LOS
+	, clm_li.Svc_From_Dt-clm_li.Svc_To_Dt as "LOS"
 
 
 	, case when rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
-		ELSE rd.net_pd_rd_amt END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
+		ELSE rd.net_pd_rd_amt END as "Net_Elig_or_RD" -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
 		
-	, prov.prov_fincl_id as bill_pfin
+	, prov.prov_fincl_id as "bill_pfin"
 	, CASE WHEN prov.prov_fincl_id IS NULL THEN ''
 		WHEN LENGTH(prov.prov_fincl_id) > 10 THEN RIGHT(prov.prov_fincl_id, 10) 
 		ELSE prov.prov_fincl_id 
@@ -192,4 +194,7 @@ WHERE
 	AND ck.home_host_local_ind in ('HOME','LOCAL')
 	AND prov.bill_pfin='0000000000331' 
 	-- Really important to not use the trimmed calculation
+) 
+PRIMARY INDEX(bill_pfin,CLAIM_LINE_KEY)
+WITH DATA 
 ;
