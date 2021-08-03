@@ -195,7 +195,6 @@ WHERE
 	AND prov.bill_pfin='0000000000331' 
 	-- Really important to not use the trimmed calculation
 SAMPLE 10
-) 
+) WITH DATA 
 PRIMARY INDEX(bill_pfin,CLAIM_LINE_KEY)
-WITH DATA 
 ;
