@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 0,
+    "versionNumber": 1,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628006958545
+    "lastModifiedOn": 1628007138267
   },
   "creationTag": {
     "versionNumber": 0,
@@ -43,6 +43,7 @@
   },
   "tags": [],
   "params": {
+    "assumedDbTzForUnknownTz": "GMT",
     "primaryIndexBehavior": "AUTO",
     "primaryIndexIsUnique": false,
     "primaryIndexColumns": [],
@@ -51,12 +52,14 @@
     "mode": "table",
     "partitioningType": "custom",
     "normalizeDoubles": true,
-    "table": "${projectKey}_contract_monitoring_testing",
+    "table": "contract_monitoring_testing",
+    "schema": "U429930",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
     "writeJDBCBadDataBehavior": "DISCARD_ROW",
     "readColsWithUnknownTzAsDates": false,
-    "readSQLDateColsAsDSSDates": true
+    "readSQLDateColsAsDSSDates": true,
+    "assumedTzForUnknownTz": "GMT"
   },
   "schema": {
     "columns": [],
