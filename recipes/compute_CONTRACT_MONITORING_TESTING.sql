@@ -1,4 +1,4 @@
- 
+CREATE VIEW IL_CONTRACT_MONITORING 
 SELECT
 --- Base RADAR tables ---
 	ck.dw_clm_key
