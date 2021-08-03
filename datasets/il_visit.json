@@ -1,0 +1,519 @@
+{
+  "type": "Teradata",
+  "managed": false,
+  "checklists": {
+    "checklists": []
+  },
+  "checks": [],
+  "customMeta": {
+    "kv": {}
+  },
+  "flowOptions": {
+    "virtualizable": false,
+    "rebuildBehavior": "NORMAL",
+    "crossProjectBuildBehavior": "DEFAULT"
+  },
+  "readWriteOptions": {
+    "preserveOrder": false,
+    "writeBuckets": 1,
+    "forceSingleOutputFile": false,
+    "defaultReadOrdering": {
+      "enabled": false,
+      "rules": []
+    }
+  },
+  "partitioning": {
+    "ignoreNonMatchingFile": false,
+    "considerMissingRequestedPartitionsAsEmpty": false,
+    "dimensions": []
+  },
+  "versionTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628006829085
+  },
+  "creationTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628006829085
+  },
+  "tags": [
+    "origin:sql_import",
+    "Teradata_PROD_NPID"
+  ],
+  "params": {
+    "primaryIndexBehavior": "AUTO",
+    "primaryIndexIsUnique": false,
+    "primaryIndexColumns": [],
+    "connection": "Teradata_PROD_NPID",
+    "notReadyIfEmpty": false,
+    "mode": "table",
+    "partitioningType": "custom",
+    "normalizeDoubles": true,
+    "table": "il_visit",
+    "schema": "ENTPR_BP_ADS_PSI_VIEWS",
+    "tableCreationMode": "auto",
+    "writeInsertBatchSize": 10000,
+    "writeJDBCBadDataBehavior": "DISCARD_ROW",
+    "readColsWithUnknownTzAsDates": false,
+    "readSQLDateColsAsDSSDates": true
+  },
+  "schema": {
+    "columns": [
+      {
+        "name": "dw_visit_key",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "billd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "bnft_paymt_lvl_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "brth_dt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "disc_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "disc_prod_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "drft_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "drg_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "dw_acc_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "dw_clm_key",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "dw_mbr_key",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "ecu_mc_eligty_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "edw_elig_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "elig_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "fincl_arngmt_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "grp_base",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "grp_sect",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hcpcs_cpt_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hcsc_pat_pln_id",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hcsc_prov_pln_id",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hmo_rare_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "icd_vrsn_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "ipar_acc_fee_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "ipar_clm_typ_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "ipar_surchrg_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "maj_diag_cat_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mbr_base",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mbr_postl_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mbr_rel_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mbr_sex_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mc_eligty_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "mkt_sgmt_admnstn_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "non_covd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "non_part_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "oth_payr_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "oth_payr_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "oth_payr_primy_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "out_ntwk_ind",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pat_shr_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pcp_1_porg_id",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pd_dt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pd_thru_dt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "pkg_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "plc_of_trmnt_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "primy_dschrg_diag_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "primy_icd_prcdr_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "primy_oth_payr_typ_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "proc_cat",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "prod_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "prod_typ_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "prov_id",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "psi_disc_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "reimb_mthd_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "rvnu_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svc_from_dt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svc_to_dt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svc_unit_cnt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svcg_prov_parpn_lvl_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svcg_prov_spclty_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "svcg_prov_typ_cd",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "tccwin_area_id",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "visit_cnt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "wght_den_cnt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "wght_num",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hdr_disc_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "hdr_disc_amtC",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "net_elig_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "net_pd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "net_elig_rd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "net_pd_rd_amt",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "GOVT_SBSD_AMT",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "grvu",
+        "type": "string",
+        "maxLength": 418
+      },
+      {
+        "name": "grvu_status",
+        "type": "string",
+        "maxLength": 418
+      }
+    ],
+    "userModified": true
+  },
+  "metrics": {
+    "probes": [
+      {
+        "type": "basic",
+        "enabled": true,
+        "computeOnBuildMode": "PARTITION",
+        "meta": {
+          "name": "Basic data",
+          "level": 0
+        },
+        "configuration": {}
+      },
+      {
+        "type": "records",
+        "enabled": true,
+        "computeOnBuildMode": "NO",
+        "meta": {
+          "name": "Record count",
+          "level": 0
+        },
+        "configuration": {}
+      }
+    ],
+    "engineConfig": {
+      "padRunsWithMetrics": false,
+      "hive": {
+        "active": true,
+        "extraConf": []
+      },
+      "basic": {},
+      "dss": {
+        "active": true,
+        "selection": {
+          "useMemTable": false,
+          "filter": {
+            "distinct": false,
+            "enabled": false
+          },
+          "partitionSelectionMethod": "ALL",
+          "latestPartitionsN": 1,
+          "ordering": {
+            "enabled": false,
+            "rules": []
+          },
+          "samplingMethod": "FULL",
+          "maxRecords": -1,
+          "targetRatio": 0.02,
+          "withinFirstN": -1,
+          "maxReadUncompressedBytes": -1
+        }
+      },
+      "sql": {
+        "active": true
+      },
+      "impala": {
+        "active": true
+      },
+      "spark": {
+        "active": true,
+        "extraConf": []
+      },
+      "python": {}
+    },
+    "displayedState": {
+      "columns": [],
+      "metrics": [
+        "basic:COUNT_COLUMNS",
+        "records:COUNT_RECORDS"
+      ]
+    }
+  },
+  "metricsChecks": {
+    "runOnBuild": false,
+    "checks": [],
+    "displayedState": {
+      "checks": []
+    }
+  },
+  "customFields": {}
+}
