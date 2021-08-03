@@ -192,7 +192,7 @@ WHERE
 	AND clm_li.disp_cd = 'A'
 	AND ck.source_schema_cd IN ('IL')
 	AND ck.home_host_local_ind in ('HOME','LOCAL')
-	AND prov.bill_pfin='0000000000331' 
+	AND prov.prov_fincl_id='0000000000331' 
 	-- Really important to not use the trimmed calculation
 SAMPLE 10
 ) WITH DATA 
