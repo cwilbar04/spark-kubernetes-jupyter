@@ -2,8 +2,9 @@
 CREATE MULTISET TABLE  ${tbl:CW_IL_CONTRACT_MONITORING} AS (
 SELECT
     DISTINCT
+    concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY"
 --- Base RADAR tables ---
-	ck.dw_clm_key
+	, ck.dw_clm_key
 	, ck.provider_payee_name
 	, ck.dw_mbr_key
 	, ck.incurd_dt	
@@ -125,5 +126,5 @@ WHERE
 	AND prov.prov_fincl_id='0000000000331' 
 	-- Really important to not use the trimmed calculation
 ) WITH DATA
-NO UNIQUE INDEX
-    ;
+NO PRIMARY INDEX;
+
