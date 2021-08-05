@@ -1,3 +1,6 @@
+-- Call stored procedure to drop the table if it already exists
+CALL  ${schema:CW_IL_CONTRACT_MONITORING}.DROP_TABLE_IF_EXISTS('${tbl:CW_IL_CONTRACT_MONITORING}');
+
 --WITH ALL_CLAIMS AS (
 CREATE OR REPLACE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
     SELECT
@@ -99,4 +102,4 @@ CREATE OR REPLACE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         AND ck.source_schema_cd IN ('IL')
         AND ck.home_host_local_ind in ('HOME', 'LOCAL')
         AND prov.prov_fincl_id = '0000000000331' -- Really important to not use the trimmed calculation
-) WITH DATA NO PRIMARY INDEX;
+) WITH DATA PRIMARY INDEX(CLAIM_LINE_KEY);
