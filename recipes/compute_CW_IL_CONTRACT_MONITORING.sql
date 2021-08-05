@@ -100,7 +100,7 @@ LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE plcy_code on plcy_code.code_cd = plcy
 		and plcy_code.column_name = 'FINCL_ARNGMT_CD'
 		and plcy_code.exp_date >= '2020-07-21'
 
--- Additional policy info.
+-- Additional account info.
 LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = ck.dw_acct_key
 	and acct.now_ind = 'Y'
  
