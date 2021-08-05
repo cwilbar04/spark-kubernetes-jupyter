@@ -1,5 +1,5 @@
 --WITH ALL_CLAIMS AS (
-CREATE MULTISET TABLE ${tbl:cw_il_contract_monitoring} AS (
+CREATE MULTISET TABLE  ${tbl:CW_IL_CONTRACT_MONITORING} AS (
 SELECT
     DISTINCT
 --- Base RADAR tables ---
