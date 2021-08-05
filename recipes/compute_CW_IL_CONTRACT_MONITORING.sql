@@ -11,7 +11,11 @@ SELECT
 	, clm_li.Li_num
 	, clm_li.HCPCS_CPT_Cd
 	, cpt_code.code_txt as HCPCS_CPT_Code_Desc
-	, rvcode.code_txt as RevCD_Desc			
+	, rvcode.code_txt as RevCD_Desc		
+   	, CASE 
+		WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
+		ELSE cpt_code.code_txt
+	END AS "HCPC_OR_REV"
 	, clm_li.rvnu_cd
 	, clm_li.prov_alwd_amt
 	, clm_li.Svc_From_Dt-clm_li.Svc_To_Dt as LOS
