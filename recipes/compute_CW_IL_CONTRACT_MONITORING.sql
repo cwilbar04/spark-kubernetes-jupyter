@@ -21,8 +21,8 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         clm_li.rvnu_cd,
         clm_li.prov_alwd_amt,
         clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
-        /*     , case when rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
-        		ELSE rd.net_pd_rd_amt END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt	 */,
+        , case when rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
+        		ELSE rd.net_pd_rd_amt END as Net_Elig_or_RD, -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
         prov.prov_fincl_id as bill_pfin,
         CASE WHEN prov.prov_fincl_id IS NULL THEN '' WHEN LENGTH(prov.prov_fincl_id) > 10 THEN RIGHT(prov.prov_fincl_id, 10) ELSE prov.prov_fincl_id END as bill_pfin_10trimmed,
         prov.primy_prcg_prov_spclty_cd,
@@ -36,11 +36,9 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         plcy.FINCL_ARNGMT_CD,
         plcy_code.code_txt as FINCL_ARNGMT_CD_Desc -- Extra account info.,
         acct.acct_name
-        /*
         -- RD amount & category from DSL 
         	, rd.net_elig_rd_amt
         	, dsl.code_txt
-        */
         -- Currently just getting the DRG Code.,
         clmdrg.drg_cd
     FROM
@@ -83,7 +81,6 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         and plcy_code.exp_date >= '2020-07-21' -- Additional account info.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = ck.dw_acct_key
         and acct.now_ind = 'Y'
-        /* 
         -- RD?? Amount does not appear to be used in Tableau. 
         LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit rd on rd.dw_clm_key = ck.dw_clm_key 
         	and clm_li.hcpcs_cpt_cd = rd.hcpcs_cpt_cd
@@ -91,7 +88,6 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table dsl
         	on cat.tos_cat = dsl.code_cd
         	and dsl.column_name = 'tos_cat' 
-        */
         -- Currently just getting the DRG Code.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = ck.DW_CLM_KEY
         and clmdrg.DRG_TYP_CD = 'D'
@@ -101,5 +97,16 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         AND clm_li.disp_cd = 'A'
         AND ck.source_schema_cd IN ('IL')
         AND ck.home_host_local_ind in ('HOME', 'LOCAL')
-        AND prov.prov_fincl_id = '0000000000331' -- Really important to not use the trimmed calculation
+        AND prov.prov_fincl_id in (
+            '0000000000331', 
+            '0000000000087', 
+            '0000000050185',
+            '0000000000009',
+            '0000000000015',
+            '0000000000052',
+            '0000000000084',
+            '0000000000087',
+            '0000000000112',
+            '0000000000331',
+            '0000000000363')-- Really important to not use the trimmed calculation
 ) WITH DATA PRIMARY INDEX(CLAIM_LINE_KEY);
