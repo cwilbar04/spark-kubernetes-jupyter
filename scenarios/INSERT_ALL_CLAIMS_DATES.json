@@ -1,0 +1,30 @@
+{
+  "projectKey": "ILCONTRACTMONITORINGTESTING",
+  "id": "INSERT_ALL_CLAIMS_DATES",
+  "type": "step_based",
+  "name": "Insert_All_Claims_Dates",
+  "active": false,
+  "versionTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628707624707
+  },
+  "checklists": {
+    "checklists": []
+  },
+  "delayedTriggersBehavior": {
+    "delayWhileRunning": true,
+    "squashDelayedTriggers": true,
+    "suppressTriggersWhileRunning": true
+  },
+  "tags": [],
+  "triggers": [],
+  "reporters": [],
+  "params": {
+    "steps": []
+  },
+  "automationLocal": false,
+  "customFields": {}
+}
