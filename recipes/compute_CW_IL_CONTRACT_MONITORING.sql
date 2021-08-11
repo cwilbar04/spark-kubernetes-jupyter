@@ -5,7 +5,7 @@ CALL  ${schema:CW_IL_CONTRACT_MONITORING}.DROP_TABLE_IF_EXISTS('${tbl:CW_IL_CONT
 CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
     SELECT
         DISTINCT 
-        concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY" 
+        concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY", 
     
     --- Base RADAR tables ---,
         ck.dw_clm_key,
