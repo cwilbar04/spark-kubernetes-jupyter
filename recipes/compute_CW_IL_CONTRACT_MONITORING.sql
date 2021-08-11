@@ -5,42 +5,50 @@ CALL  ${schema:CW_IL_CONTRACT_MONITORING}.DROP_TABLE_IF_EXISTS('${tbl:CW_IL_CONT
 CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
     SELECT
         DISTINCT 
-        concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY", 
+        concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY" 
     
-    --- Base RADAR tables ---,
-        ck.dw_clm_key,
-        ck.provider_payee_name,
-        ck.dw_mbr_key,
-        ck.incurd_dt,
-        clm_li.Li_num,
-        clm_li.HCPCS_CPT_Cd,
-        cpt_code.code_txt as HCPCS_CPT_Code_Desc,
-        rvcode.code_txt as RevCD_Desc,
-        CASE WHEN cpt_code.code_txt is NULL
-        OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt ELSE cpt_code.code_txt END AS "HCPC_OR_REV",
-        clm_li.rvnu_cd,
-        clm_li.prov_alwd_amt,
-        clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
-        , case when rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
-        		ELSE rd.net_pd_rd_amt END as Net_Elig_or_RD, -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
-        prov.prov_fincl_id as bill_pfin,
-        CASE WHEN prov.prov_fincl_id IS NULL THEN '' WHEN LENGTH(prov.prov_fincl_id) > 10 THEN RIGHT(prov.prov_fincl_id, 10) ELSE prov.prov_fincl_id END as bill_pfin_10trimmed,
-        prov.primy_prcg_prov_spclty_cd,
-        diag.code_txt as prim_diag -- from clm_li.primy_diag_cd,
-        ccs2.diag_desc as "ICD-10-CM Codes Description",
-        ccs2.CCS_desc as "CCSR Category Description" --- Additional Member info,
-        mbr.gndr_cd,
-        2021 - year(mbr.dob_dt) as age -- Intentionally using 2021? Do we want a more accurate and dynamic DOB calculation using current date function and do we care about at least getting to the month level?,
-        zip.POSTL_CD as mbr_zip,
-        zip.CITY_NAME as mbr_city2 -- Extra policy info. -- potential for duplication here.,
-        plcy.FINCL_ARNGMT_CD,
-        plcy_code.code_txt as FINCL_ARNGMT_CD_Desc -- Extra account info.,
-        acct.acct_name
+    --- Base RADAR tables ---
+        ,ck.dw_clm_key
+        ,ck.provider_payee_name
+        ,ck.dw_mbr_key
+        ,ck.incurd_dt
+        ,clm_li.Li_num
+        ,clm_li.HCPCS_CPT_Cd
+        ,cpt_code.code_txt as HCPCS_CPT_Code_Desc
+        ,rvcode.code_txt as RevCD_Desc
+        ,CASE 
+            WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt 
+            ELSE cpt_code.code_txt 
+        END AS "HCPC_OR_REV"
+        ,clm_li.rvnu_cd
+        ,clm_li.prov_alwd_amt
+        ,clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
+        ,CASE 
+            WHEN rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
+        	ELSE rd.net_pd_rd_amt 
+        END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
+        ,prov.prov_fincl_id as bill_pfin
+        ,CASE 
+            WHEN prov.prov_fincl_id IS NULL THEN '' 
+            WHEN LENGTH(prov.prov_fincl_id) > 10 THEN RIGHT(prov.prov_fincl_id, 10) 
+            ELSE prov.prov_fincl_id 
+        END as bill_pfin_10trimmed
+        ,prov.primy_prcg_prov_spclty_cd
+        ,diag.code_txt as prim_diag -- from clm_li.primy_diag_cd
+        ,ccs2.diag_desc as "ICD-10-CM Codes Description"
+        ,ccs2.CCS_desc as "CCSR Category Description" --- Additional Member info
+        ,mbr.gndr_cd
+        ,2021 - year(mbr.dob_dt) as age -- Intentionally using 2021? Do we want a more accurate and dynamic DOB calculation using current date function and do we care about at least getting to the month level?
+        ,zip.POSTL_CD as mbr_zip
+        ,zip.CITY_NAME as mbr_city2 -- Extra policy info. -- potential for duplication here.
+        ,plcy.FINCL_ARNGMT_CD
+        ,plcy_code.code_txt as FINCL_ARNGMT_CD_Desc -- Extra account info.
+        ,acct.acct_name
         -- RD amount & category from DSL 
-        	, rd.net_elig_rd_amt
-        	, dsl.code_txt
+        ,rd.net_elig_rd_amt
+        ,dsl.code_txt
         -- Currently just getting the DRG Code.,
-        clmdrg.drg_cd
+        ,clmdrg.drg_cd
     FROM
         --- Base RADAR tables ---
         "RADAR_VIEWS"."radardm_prod_claim" AS ck
