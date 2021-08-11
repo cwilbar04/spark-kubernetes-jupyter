@@ -16,72 +16,7 @@
   "maxRunningActivities": 0,
   "inputs": {
     "main": {
-      "items": [
-        {
-          "ref": "PLCY",
-          "deps": []
-        },
-        {
-          "ref": "CODE_TABLE",
-          "deps": []
-        },
-        {
-          "ref": "radardm_prod_provider",
-          "deps": []
-        },
-        {
-          "ref": "MBR",
-          "deps": []
-        },
-        {
-          "ref": "il_visit_cat",
-          "deps": []
-        },
-        {
-          "ref": "ACCT",
-          "deps": []
-        },
-        {
-          "ref": "dsl_code_table",
-          "deps": []
-        },
-        {
-          "ref": "ADDR",
-          "deps": []
-        },
-        {
-          "ref": "MBR_PLCY",
-          "deps": []
-        },
-        {
-          "ref": "CLM_DRG",
-          "deps": []
-        },
-        {
-          "ref": "MBR_ADDR",
-          "deps": []
-        },
-        {
-          "ref": "POSTL_REFR",
-          "deps": []
-        },
-        {
-          "ref": "radardm_prod_claim",
-          "deps": []
-        },
-        {
-          "ref": "radardm_prod_claim_line",
-          "deps": []
-        },
-        {
-          "ref": "SG_CCS",
-          "deps": []
-        },
-        {
-          "ref": "il_visit",
-          "deps": []
-        }
-      ]
+      "items": []
     }
   },
   "outputs": {
@@ -95,11 +30,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 27,
+    "versionNumber": 28,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628698739720
+    "lastModifiedOn": 1628698971532
   },
   "creationTag": {
     "versionNumber": 0,
