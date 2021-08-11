@@ -1,12 +1,11 @@
 -- Call stored procedure to drop the table if it already exists
-CALL  ${schema:CW_IL_CONTRACT_MONITORING}.DROP_TABLE_IF_EXISTS('${tbl:CW_IL_CONTRACT_MONITORING}');
+CALL ${schema:CW_IL_CONTRACT_MONITORING}.DROP_TABLE_IF_EXISTS('${tbl:CW_IL_CONTRACT_MONITORING}');
 
 --WITH ALL_CLAIMS AS (
 CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
     SELECT
         DISTINCT 
         concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY" 
-    
     --- Base RADAR tables ---
         ,ck.dw_clm_key
         ,ck.provider_payee_name
