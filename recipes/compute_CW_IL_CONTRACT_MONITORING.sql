@@ -102,10 +102,10 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = ck.DW_CLM_KEY
             and clmdrg.DRG_TYP_CD = 'D'
     WHERE
-        ck.incurd_dt BETWEEN  ${start_date}  AND ${end_date} 
+        ck.incurd_dt BETWEEN  '${start_date}'  AND '${end_date}' 
         AND ck.disp_cd = 'A'
         AND clm_li.disp_cd = 'A'
         AND ck.source_schema_cd IN ('IL')
         AND ck.home_host_local_ind in ('HOME', 'LOCAL')
-        AND prov.prov_fincl_id = ${prov_finc_id}  -- Really important to not use the trimmed calculation
+        AND prov.prov_fincl_id = '${prov_finc_id}'  -- Really important to not use the trimmed calculation
 ) WITH DATA PRIMARY INDEX(dw_clm_key,Li_num);
