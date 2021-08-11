@@ -52,52 +52,55 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
         --- Base RADAR tables ---
         "RADAR_VIEWS"."radardm_prod_claim" AS ck
         INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
-        AND ck.source_schema_cd = clm_li.source_schema_cd
+            AND ck.source_schema_cd = clm_li.source_schema_cd
         INNER JOIN RADAR_VIEWS.radardm_prod_provider prov on ck.billing_dw_prov_fincl_key = prov.dw_prov_fincl_key
         LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = clm_li.primy_diag_cd -- Code descriptions joined to RADAR views.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE cpt_code on cpt_code.code_cd = clm_li.hcpcs_cpt_cd
-        and cpt_code.column_name = 'hcpcs_cpt_cd'
+            and cpt_code.column_name = 'hcpcs_cpt_cd'
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE diag on diag.code_cd = clm_li.primy_diag_cd
-        and diag.column_name = 'diag_cd'
+            and diag.column_name = 'diag_cd'
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE rvcode on rvcode.code_cd = clm_li.rvnu_cd
-        and rvcode.column_name = 'rvnu_cd'
-        and rvcode.exp_date >= '2020-07-21' -- why this date filter? There appears to be no expired codes.
+            and rvcode.column_name = 'rvnu_cd'
+            and rvcode.exp_date >= '2020-07-21' -- why this date filter? There appears to be no expired codes.
         --- Base RADAR tables ---
         -- Additional Member Info
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.MBR mbr on mbr.DW_MBR_KEY = ck.DW_MBR_KEY
-        and mbr.NOW_IND = 'Y'
-        and mbr.FNL_IND = 'Y'
+            and mbr.NOW_IND = 'Y'
+            and mbr.FNL_IND = 'Y'
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.MBR_ADDR MBR_ADDR on MBR_ADDR.DW_MBR_KEY = ck.DW_MBR_KEY
-        and MBR_ADDR.NOW_IND = 'Y'
-        and MBR_ADDR.FNL_IND = 'Y'
-        and MBR_ADDR.PRIMY_LOCN_ADDR_IND = 'Y'
-        and MBR_ADDR.PRIMY_MAIL_ADDR_IND = 'Y'
+            and MBR_ADDR.NOW_IND = 'Y'
+            and MBR_ADDR.FNL_IND = 'Y'
+            and MBR_ADDR.PRIMY_LOCN_ADDR_IND = 'Y'
+            and MBR_ADDR.PRIMY_MAIL_ADDR_IND = 'Y'
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ADDR maddr on maddr.DW_ADDR_KEY = MBR_ADDR.DW_ADDR_KEY
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.POSTL_REFR zip on maddr.DW_POSTL_KEY = zip.DW_POSTL_KEY
-        and zip.NOW_IND = 'Y' -- Extra policy info.
+            and zip.NOW_IND = 'Y' -- Extra policy info.
         -- This introduces possibility of duplication of lines where there are multiple active policies for a member
         -- and the active policies have different FINCL_ARNGMT_CD.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.MBR_PLCY mbr_plcy on ck.DW_MBR_KEY = mbr_plcy.DW_MBR_KEY
-        AND mbr_plcy.fnl_ind = 'Y'
-        and mbr_plcy.now_ind = 'Y'
+            AND mbr_plcy.fnl_ind = 'Y'
+            and mbr_plcy.now_ind = 'Y'
         JOIN ENTPRIL_PRD_VIEWS_ALL.PLCY plcy on mbr_plcy.DW_PLCY_KEY = plcy.DW_PLCY_KEY
-        AND plcy.fnl_ind = 'Y'
-        AND plcy.prod_ln_cd = 'H'
+            AND plcy.fnl_ind = 'Y'
+            AND plcy.prod_ln_cd = 'H'
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE plcy_code on plcy_code.code_cd = plcy.FINCL_ARNGMT_CD
-        and plcy_code.column_name = 'FINCL_ARNGMT_CD'
-        and plcy_code.exp_date >= '2020-07-21' -- Additional account info.
+            and plcy_code.column_name = 'FINCL_ARNGMT_CD'
+            and plcy_code.exp_date >= '2020-07-21' -- Additional account info.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = ck.dw_acct_key
-        and acct.now_ind = 'Y'
+            and acct.now_ind = 'Y'
         -- RD?? Amount does not appear to be used in Tableau. 
         LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit rd on rd.dw_clm_key = ck.dw_clm_key 
-        	and clm_li.hcpcs_cpt_cd = rd.hcpcs_cpt_cd
+            and clm_li.hcpcs_cpt_cd = rd.hcpcs_cpt_cd
+            and clm_li.svc_from_dt = rd.svc_from_dt 
+            and clm_li.svc_to_dt = rd.svc_to_dt 
+            and clm_li.pd_dt = rd.pd_dt
+            and clm_li.rvnu_cd = rd.rvnu_cd 
         LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit_cat cat on cat.dw_visit_key = rd.dw_visit_key	
-        LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table dsl
-        	on cat.tos_cat = dsl.code_cd
+        LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table dsl on cat.tos_cat = dsl.code_cd
         	and dsl.column_name = 'tos_cat' 
         -- Currently just getting the DRG Code.
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = ck.DW_CLM_KEY
-        and clmdrg.DRG_TYP_CD = 'D'
+            and clmdrg.DRG_TYP_CD = 'D'
     WHERE
         ck.incurd_dt BETWEEN '2019-01-01' AND '2020-12-31'
         AND ck.disp_cd = 'A'
