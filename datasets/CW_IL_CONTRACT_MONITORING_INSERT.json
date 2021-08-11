@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 1,
+    "versionNumber": 2,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628706860863
+    "lastModifiedOn": 1628706989689
   },
   "creationTag": {
     "versionNumber": 0,
@@ -62,8 +62,181 @@
     "assumedTzForUnknownTz": "GMT"
   },
   "schema": {
-    "columns": [],
-    "userModified": true
+    "columns": [
+      {
+        "name": "CLAIM_LINE_KEY",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 41
+      },
+      {
+        "name": "dw_clm_key",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "provider_payee_name",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 50
+      },
+      {
+        "name": "dw_mbr_key",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "incurd_dt",
+        "type": "date",
+        "originalType": "DATE",
+        "timestampNoTzAsDate": true
+      },
+      {
+        "name": "li_num",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "hcpcs_cpt_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 6
+      },
+      {
+        "name": "HCPCS_CPT_Code_Desc",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "RevCD_Desc",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "HCPC_OR_REV",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "rvnu_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 4
+      },
+      {
+        "name": "prov_alwd_amt",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "LOS",
+        "type": "int",
+        "originalType": "INTEGER"
+      },
+      {
+        "name": "Net_Elig_or_RD",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "bill_pfin",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 30
+      },
+      {
+        "name": "bill_pfin_10trimmed",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 30
+      },
+      {
+        "name": "primy_prcg_prov_spclty_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 3
+      },
+      {
+        "name": "prim_diag",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "ICD-10-CM Codes Description",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "CCSR Category Description",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "GNDR_CD",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 1
+      },
+      {
+        "name": "age",
+        "type": "int",
+        "originalType": "INTEGER"
+      },
+      {
+        "name": "mbr_zip",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 12
+      },
+      {
+        "name": "mbr_city2",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 28
+      },
+      {
+        "name": "FINCL_ARNGMT_CD",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 4
+      },
+      {
+        "name": "FINCL_ARNGMT_CD_Desc",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "ACCT_NAME",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 50
+      },
+      {
+        "name": "net_elig_rd_amt",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "CODE_TXT",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "DRG_CD",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 3
+      }
+    ],
+    "userModified": false
   },
   "metrics": {
     "probes": [
