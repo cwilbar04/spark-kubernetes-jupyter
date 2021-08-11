@@ -1,6 +1,6 @@
 
 --WITH ALL_CLAIMS AS (
-INSERT INTO ${tbl:CW_IL_CONTRACT_MONITORING}
+INSERT INTO ${tbl:CW_IL_CONTRACT_MONITORING_INSERT}
     SELECT
         DISTINCT 
         concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY" 
