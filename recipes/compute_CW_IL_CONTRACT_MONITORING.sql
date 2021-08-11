@@ -115,8 +115,6 @@ CREATE MULTISET TABLE ${tbl:CW_IL_CONTRACT_MONITORING} AS (
             '0000000000015',
             '0000000000052',
             '0000000000084',
-            '0000000000087',
             '0000000000112',
-            '0000000000331',
             '0000000000363')-- Really important to not use the trimmed calculation
 ) WITH DATA PRIMARY INDEX(CLAIM_LINE_KEY);
