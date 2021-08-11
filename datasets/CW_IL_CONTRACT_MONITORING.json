@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 3,
+    "versionNumber": 4,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628176792504
+    "lastModifiedOn": 1628703251246
   },
   "creationTag": {
     "versionNumber": 0,
@@ -115,6 +115,12 @@
         "maxLength": 255
       },
       {
+        "name": "HCPC_OR_REV",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
         "name": "rvnu_cd",
         "type": "string",
         "originalType": "CHAR",
@@ -129,6 +135,11 @@
         "name": "LOS",
         "type": "int",
         "originalType": "INTEGER"
+      },
+      {
+        "name": "Net_Elig_or_RD",
+        "type": "double",
+        "originalType": "DECIMAL"
       },
       {
         "name": "bill_pfin",
@@ -206,6 +217,17 @@
         "type": "string",
         "originalType": "VARCHAR",
         "maxLength": 50
+      },
+      {
+        "name": "net_elig_rd_amt",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
+        "name": "CODE_TXT",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 255
       },
       {
         "name": "DRG_CD",
