@@ -21,18 +21,18 @@
     "main": {
       "items": [
         {
-          "ref": "testing",
+          "ref": "CW_SANDBOX_CONTRACT_MONITORING_IL",
           "appendMode": false
         }
       ]
     }
   },
   "versionTag": {
-    "versionNumber": 6,
+    "versionNumber": 7,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628783708813
+    "lastModifiedOn": 1628785561775
   },
   "creationTag": {
     "versionNumber": 0,
