@@ -1,4 +1,4 @@
- CREATE MULTISET TABLE RADAR.cw_sandbox_il_contract_monitoring ,
+ CREATE MULTISET TABLE IF NOT EXISTS RADAR.cw_sandbox_contract_monitoring_il ,
      NO BEFORE JOURNAL,
      NO AFTER JOURNAL,
      CHECKSUM = DEFAULT,
