@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 2,
+    "versionNumber": 3,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628787808948
+    "lastModifiedOn": 1628790401073
   },
   "creationTag": {
     "versionNumber": 0,
@@ -52,7 +52,7 @@
     "mode": "table",
     "partitioningType": "custom",
     "normalizeDoubles": true,
-    "table": "cw_sandbox_contract_monitoring_il_create_table",
+    "table": "cw_sandbox_contract_monitoring_il",
     "schema": "RADAR",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
@@ -236,7 +236,7 @@
         "maxLength": 3
       }
     ],
-    "userModified": false
+    "userModified": true
   },
   "metrics": {
     "probes": [
