@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 0,
+    "versionNumber": 1,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628785752892
+    "lastModifiedOn": 1628786937714
   },
   "creationTag": {
     "versionNumber": 0,
@@ -43,6 +43,7 @@
   },
   "tags": [],
   "params": {
+    "assumedDbTzForUnknownTz": "GMT",
     "primaryIndexBehavior": "AUTO",
     "primaryIndexIsUnique": false,
     "primaryIndexColumns": [],
@@ -52,11 +53,13 @@
     "partitioningType": "custom",
     "normalizeDoubles": true,
     "table": "cw_sandbox_contract_monitoring_il_create_table",
+    "schema": "RADAR",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
     "writeJDBCBadDataBehavior": "DISCARD_ROW",
     "readColsWithUnknownTzAsDates": false,
-    "readSQLDateColsAsDSSDates": true
+    "readSQLDateColsAsDSSDates": true,
+    "assumedTzForUnknownTz": "GMT"
   },
   "schema": {
     "columns": [],
