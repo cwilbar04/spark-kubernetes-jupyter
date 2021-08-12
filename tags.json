@@ -2,6 +2,7 @@
   "tags": {
     "Teradata_PROD_NPID": {},
     "origin:sql_import": {},
-    "Teradata_PROD": {}
+    "Teradata_PROD": {},
+    "recipe-editor": {}
   }
 }
