@@ -9,7 +9,7 @@ from dataiku import pandasutils as pdu
 # TODO: Write here your actual code that computes the outputs
 # NB: DSS supports several kinds of APIs for reading and writing data. Please see doc.
 
-testing_df = ... # Compute a Pandas dataframe to write into testing
+testing_df = [1,2,3]
 
 
 # Write recipe outputs
