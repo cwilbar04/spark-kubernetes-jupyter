@@ -1,0 +1,47 @@
+{
+  "type": "sql_script",
+  "neverRecomputeExistingPartitions": false,
+  "optionalDependencies": false,
+  "params": {
+    "allowMultipleConnections": false,
+    "usePsql": true,
+    "inferOutputDatasetsSchema": true,
+    "statementsParsingMode": "SPLIT",
+    "skipPrerunValidate": false
+  },
+  "customMeta": {
+    "kv": {}
+  },
+  "redispatchPartitioning": false,
+  "maxRunningActivities": 0,
+  "inputs": {},
+  "outputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "CW_SANDBOX_CONTRACT_MONITORING_IL_CREATE_TABLE",
+          "appendMode": false
+        }
+      ]
+    }
+  },
+  "versionTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628785784670
+  },
+  "creationTag": {
+    "versionNumber": 0,
+    "lastModifiedBy": {
+      "login": "U429930"
+    },
+    "lastModifiedOn": 1628785784670
+  },
+  "tags": [],
+  "customFields": {},
+  "checklists": {
+    "checklists": []
+  }
+}
