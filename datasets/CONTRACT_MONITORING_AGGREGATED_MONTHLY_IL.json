@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 0,
+    "versionNumber": 1,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1629126312255
+    "lastModifiedOn": 1629126498020
   },
   "creationTag": {
     "versionNumber": 0,
@@ -43,6 +43,7 @@
   },
   "tags": [],
   "params": {
+    "assumedDbTzForUnknownTz": "GMT",
     "primaryIndexBehavior": "AUTO",
     "primaryIndexIsUnique": false,
     "primaryIndexColumns": [],
@@ -51,12 +52,14 @@
     "mode": "table",
     "partitioningType": "custom",
     "normalizeDoubles": true,
-    "table": "contract_monitoring_aggregated_monthly_il",
+    "table": "cw_sandbox_contract_monitoring_aggregated_monthly_il",
+    "schema": "RADAR_VIEWS",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
     "writeJDBCBadDataBehavior": "DISCARD_ROW",
     "readColsWithUnknownTzAsDates": false,
-    "readSQLDateColsAsDSSDates": true
+    "readSQLDateColsAsDSSDates": true,
+    "assumedTzForUnknownTz": "GMT"
   },
   "schema": {
     "columns": [],
