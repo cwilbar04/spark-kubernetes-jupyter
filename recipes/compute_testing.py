@@ -95,9 +95,6 @@ missing_data = all_dates[~((all_dates['earliest_data_present'] == 1) & (all_date
 missing_data
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-first_of_current_month
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 to_load = pd.DataFrame(columns=['bill_pfin','start_date','end_date'])
 first_of_current_month = datetime.today().replace(day=1)
 for _,row in missing_data.iterrows():
@@ -140,6 +137,7 @@ for _,row in to_load.iterrows():
     start_date = row['start_date']
     end_date = row['end_date']
     actual_end_date = row['end_date']
+    delta = end_date-start_date
     while start_date < actual_end_date:
         try:
             insert_query = f'''
@@ -162,6 +160,7 @@ for _,row in to_load.iterrows():
                     END AS "HCPC_OR_REV"
                     ,clm_li.rvnu_cd
                     ,clm_li.prov_alwd_amt
+                    ,clm_li.billd_amt
                     ,clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
                     ,CASE
                         WHEN rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
@@ -224,7 +223,7 @@ for _,row in to_load.iterrows():
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.MBR_PLCY mbr_plcy on ck.DW_MBR_KEY = mbr_plcy.DW_MBR_KEY
                         AND mbr_plcy.fnl_ind = 'Y'
                         and mbr_plcy.now_ind = 'Y'
-                    JOIN ENTPRIL_PRD_VIEWS_ALL.PLCY plcy on mbr_plcy.DW_PLCY_KEY = plcy.DW_PLCY_KEY
+                    LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.PLCY plcy on mbr_plcy.DW_PLCY_KEY = plcy.DW_PLCY_KEY
                         AND plcy.fnl_ind = 'Y'
                         AND plcy.prod_ln_cd = 'H'
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE plcy_code on plcy_code.code_cd = plcy.FINCL_ARNGMT_CD
