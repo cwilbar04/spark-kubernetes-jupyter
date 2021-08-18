@@ -244,7 +244,7 @@ for _,row in to_load.iterrows():
                         WHEN rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
                         ELSE rd.net_pd_rd_amt
                     END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
-                    ,clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
+                    ,clm_li.Svc_To_Dt - clm_li.Svc_From_Dt as LOS
                 FROM
                     --- Base RADAR tables ---
                     "RADAR_VIEWS"."radardm_prod_claim" AS ck
