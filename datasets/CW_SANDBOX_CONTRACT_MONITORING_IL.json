@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 2,
+    "versionNumber": 3,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1629325028843
+    "lastModifiedOn": 1629325379444
   },
   "creationTag": {
     "versionNumber": 0,
@@ -196,6 +196,7 @@
         "name": "DRG_CD",
         "type": "string",
         "originalType": "CHAR",
+        "meaning": "Text",
         "maxLength": 3
       },
       {
