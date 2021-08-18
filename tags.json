@@ -1,8 +1,16 @@
 {
   "tags": {
-    "Teradata_PROD_NPID": {},
-    "origin:sql_import": {},
-    "Teradata_PROD": {},
-    "recipe-editor": {}
+    "Teradata_PROD_NPID": {
+      "color": "#1ac2ab"
+    },
+    "origin:sql_import": {
+      "color": "#FFD83D"
+    },
+    "recipe-editor": {
+      "color": "#1ac2ab"
+    },
+    "Teradata_PROD": {
+      "color": "#90a8b7"
+    }
   }
 }
