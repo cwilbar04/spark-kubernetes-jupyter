@@ -53,12 +53,14 @@
     },
     "codeEnvs": {
       "python": {
-        "mode": "INHERIT",
-        "preventOverride": false
+        "mode": "EXPLICIT_ENV",
+        "preventOverride": false,
+        "envName": "Python_3"
       },
       "r": {
         "mode": "INHERIT",
-        "preventOverride": false
+        "preventOverride": false,
+        "envName": "RShiny"
       },
       "julia": {
         "mode": "INHERIT",
@@ -178,11 +180,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 0,
+    "versionNumber": 1,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1628782915504
+    "lastModifiedOn": 1629305329534
   },
   "creationTag": {
     "versionNumber": 0,
