@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 # Recipe outputs
 CW_SANDBOX_CONTRACT_MONITORING_IL = dataiku.Dataset("CW_SANDBOX_CONTRACT_MONITORING_IL")
 output_table_name = pru.get_qualified_table_name(CW_SANDBOX_CONTRACT_MONITORING_IL)
+output_table_schema = output_table_name.split('.')[0]
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Create a single dictionary that contains the recipe variables
@@ -22,15 +23,77 @@ proj = client.get_project(proj_key)
 recipe_vars = proj.get_variables()['standard']
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+# Create SQL Execution Engine
+e = SQLExecutor2(connection=pru.get_connection_name(CW_SANDBOX_CONTRACT_MONITORING_IL))
+
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+# If re-create table = True then drop table and re-create using DDL
+if recipe_vars['drop_and_recreate_table'] is True:
+
+    drop_table_query = f'''
+    CALL {output_table_schema}.DROP_TABLE_IF_EXISTS(
+        '{output_table_name}')
+    '''
+
+    create_table_query = f'''
+    CREATE MULTISET TABLE {output_table_name} ,
+         NO BEFORE JOURNAL,
+         NO AFTER JOURNAL,
+         CHECKSUM = DEFAULT,
+         DEFAULT MERGEBLOCKRATIO
+         (
+            --- Provider Info ---
+            bill_pfin VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
+            bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
+            provider_payee_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC, -- why would billing provider be different than payee provider? Which one are we actually supposed to be monitoring here?
+            primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+
+            --- Member Info ---
+            dw_mbr_key DECIMAL(18,0),
+            gndr_cd CHAR(1) CHARACTER SET LATIN NOT CASESPECIFIC,
+ --         age INTEGER, -- commented out for now as not needed. consider age grouping if needed in future
+            mbr_zip VARCHAR(12) CHARACTER SET LATIN NOT CASESPECIFIC,
+            mbr_city VARCHAR(28) CHARACTER SET LATIN NOT CASESPECIFIC,
+            ACCT_NAME VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+
+            --- Claim Info ---
+            claim_line_key VARCHAR(41) CHARACTER SET LATIN NOT CASESPECIFIC,
+            dw_clm_key DECIMAL(18,0),
+            li_num DECIMAL(4,0),
+            incurd_dt DATE FORMAT 'YY/MM/DD',
+            incurd_month DATE FORMAT 'YY/MM/DD',
+            hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN NOT CASESPECIFIC,
+            HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            rvnu_cd CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC,
+            RevCD_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            HCPC_OR_REV_DESC VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            prim_diag VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+--          CODE_TXT CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC, -- DSL category. comment out futher testing needed
+--          FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC, -- commented out for now. need to solve duplication issues before including if needed in future
+--          FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            billd_amt DECIMAL(11,2),
+            prov_alwd_amt DECIMAL(11,2),
+            net_elig_amt DECIMAL(15,2),
+            net_elig_rd_amt DECIMAL(15,2),
+            net_pd_rd_amt DECIMAL(15,2),
+            Net_Elig_or_RD DECIMAL(15,2),
+            LOS INTEGER
+    )
+    PRIMARY INDEX ( dw_clm_key ,li_num )
+    '''
+    e.query_to_df(query=create_table_query,
+                 pre_queries=[drop_table_query])
+    print(f'{output_table_name} dropped and re-created because drop_and_create_table varaible set to {recipe_vars["drop_and_recreate_table"]}')
+
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Store the requested start and end dates as datetime values
 # Need to add a check to make sure these are valid dates in the right format
 # This allows us to split the query in to smaller parts if the spool can't handle all of it
 requested_start_date = datetime.strptime(recipe_vars['start_date'],"%Y-%m-%d")
 requested_end_date = datetime.strptime(recipe_vars['end_date'],"%Y-%m-%d")
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-# Create SQL Execution Engine
-e = SQLExecutor2(connection=pru.get_connection_name(CW_SANDBOX_CONTRACT_MONITORING_IL))
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Get current min/max date for claims in RADAR and those already moved to the Contract Monitoring table
@@ -71,28 +134,17 @@ min_max_radar = e.query_to_df(query=min_max_radar_query)
 min_max_contract = e.query_to_df(query=min_max_contract_query)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-min_max_radar
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-min_max_contract
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Merge min/max dataframe to determine what needs to be loaded
 all_dates = pd.merge(min_max_radar, min_max_contract, how='left')
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Mark all PFIN's where min/max dates match. These do not need to be loaded
 all_dates['earliest_data_present'] = np.where(all_dates['claim_radar_start_date'] ==
                                               all_dates['claim_contract_start_date'], 1, 0)
 all_dates['latest_data_present'] = np.where(all_dates['claim_radar_end_date'] ==
                                             all_dates['claim_contract_end_date'], 1, 0)
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Only need to load data if the start and end dates don't both match
 missing_data = all_dates[~((all_dates['earliest_data_present'] == 1) & (all_dates['latest_data_present'] == 1))]
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-missing_data
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 to_load = pd.DataFrame(columns=['bill_pfin','start_date','end_date'])
@@ -144,53 +196,55 @@ for _,row in to_load.iterrows():
             INSERT INTO {output_table_name}
                 SELECT
                     DISTINCT
-                    concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "CLAIM_LINE_KEY"
-            --- Base RADAR tables ---
-                    ,ck.dw_clm_key
-                    ,ck.provider_payee_name
-                    ,ck.dw_mbr_key
-                    ,ck.incurd_dt
-                    ,clm_li.Li_num
-                    ,clm_li.HCPCS_CPT_Cd
-                    ,cpt_code.code_txt as HCPCS_CPT_Code_Desc
-                    ,rvcode.code_txt as RevCD_Desc
-                    ,CASE
-                        WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
-                        ELSE cpt_code.code_txt
-                    END AS "HCPC_OR_REV"
-                    ,clm_li.rvnu_cd
-                    ,clm_li.prov_alwd_amt
-                    ,clm_li.billd_amt
-                    ,clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
-                    ,CASE
-                        WHEN rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
-                        ELSE rd.net_pd_rd_amt
-                    END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
-                    ,prov.prov_fincl_id as bill_pfin
-                    ,CASE
+            --- Provider Info ---
+                    prov.prov_fincl_id as "bill_pfin"
+                    , CASE
                         WHEN prov.prov_fincl_id IS NULL THEN ''
                         WHEN LENGTH(prov.prov_fincl_id) > 10 THEN RIGHT(prov.prov_fincl_id, 10)
                         ELSE prov.prov_fincl_id
-                    END as bill_pfin_10trimmed
-                    ,prov.primy_prcg_prov_spclty_cd
-                    ,diag.code_txt as prim_diag -- from clm_li.primy_diag_cd
-                    ,ccs2.diag_desc as "ICD-10-CM Codes Description"
-                    ,ccs2.CCS_desc as "CCSR Category Description"
-            --- Additional Member info
-                    ,mbr.gndr_cd
-                    ,year(ck.incurd_dt) - year(mbr.dob_dt) as age --Modified to use incurd_dt instead of 2021. Consider more accurate calculation if desired.
-                    ,zip.POSTL_CD as mbr_zip
-                    ,zip.CITY_NAME as mbr_city2
-            -- Extra policy info. -- potential for duplication here.
-                    ,plcy.FINCL_ARNGMT_CD
-                    ,plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
-            -- Extra account info.
-                    ,acct.acct_name
-            -- RD amount & category from DSL
-                    ,rd.net_elig_rd_amt
-                    ,dsl.code_txt
-            -- Currently just getting the DRG Code.,
-                    ,clmdrg.drg_cd
+                    END as "bill_pfin_10trimmed"
+                    , ck.provider_payee_name
+                    , prov.primy_prcg_prov_spclty_cd
+
+            --- Member Info ---
+                    , ck.dw_mbr_key
+                    , mbr.gndr_cd
+                    --, year(ck.incurd_dt) - year(mbr.dob_dt) as age -- Not currently used. Create age buckets if needed in future.
+                    , zip.POSTL_CD as "mbr_zip"
+                    , zip.CITY_NAME as "mbr_city"
+                    , acct.acct_name
+
+             --- Claim Info ---
+                    , concat(to_char(ck.dw_clm_key),'-',to_char(clm_li.Li_num)) as "claim_line_key"
+                    , ck.dw_clm_key
+                    , clm_li.Li_num
+                    , ck.incurd_dt
+                    , ck.incurd_dt - EXTRACT(DAY from ck.incurd_dt) + 1 as "incurd_month"
+                    , clm_li.HCPCS_CPT_Cd
+                    , cpt_code.code_txt as "HCPCS_CPT_Code_Desc"
+                    , clm_li.rvnu_cd
+                    , rvcode.code_txt as "RevCD_Desc"
+                    , CASE
+                        WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
+                        ELSE cpt_code.code_txt
+                    END AS "HCPC_OR_REV_DESC"
+                    , diag.code_txt as "prim_diag" -- from clm_li.primy_diag_cd
+                    , ccs2.diag_desc as "ICD-10-CM Codes Description"
+                    , ccs2.CCS_desc as "CCSR Category Description"
+                    , clmdrg.drg_cd
+                    --, dsl.code_txt -- DSL category. comment out futher testing needed
+                    --, plcy.FINCL_ARNGMT_CD -- commented out for now. need to solve duplication issues before including if needed in future
+                    --, plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
+                    , clm_li.billd_amt
+                    , clm_li.prov_alwd_amt
+                    , clm_li.net_elig_amt
+                    , rd.net_elig_rd_amt
+                    , rd.net_pd_rd_amt
+                    , CASE
+                        WHEN rd.net_elig_rd_amt IS NULL then clm_li.net_elig_amt
+                        ELSE rd.net_pd_rd_amt
+                    END as Net_Elig_or_RD -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
+                    ,clm_li.Svc_From_Dt - clm_li.Svc_To_Dt as LOS
                 FROM
                     --- Base RADAR tables ---
                     "RADAR_VIEWS"."radardm_prod_claim" AS ck
@@ -218,6 +272,7 @@ for _,row in to_load.iterrows():
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ADDR maddr on maddr.DW_ADDR_KEY = MBR_ADDR.DW_ADDR_KEY
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.POSTL_REFR zip on maddr.DW_POSTL_KEY = zip.DW_POSTL_KEY
                         and zip.NOW_IND = 'Y' -- Extra policy info.
+/*     -- Code block removed until further testing identifies how to join to MBR_PLCY without introducing duplication
                     -- This introduces possibility of duplication of lines where there are multiple active policies for a member
                     -- and the active policies have different FINCL_ARNGMT_CD.
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.MBR_PLCY mbr_plcy on ck.DW_MBR_KEY = mbr_plcy.DW_MBR_KEY
@@ -228,7 +283,9 @@ for _,row in to_load.iterrows():
                         AND plcy.prod_ln_cd = 'H'
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE plcy_code on plcy_code.code_cd = plcy.FINCL_ARNGMT_CD
                         and plcy_code.column_name = 'FINCL_ARNGMT_CD'
-                        and plcy_code.exp_date >= '2020-07-21' -- Additional account info.
+                        and plcy_code.exp_date >= '2020-07-21'
+*/
+                    -- Additional account info.
                     LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = ck.dw_acct_key
                         and acct.now_ind = 'Y'
                     -- Needed to add additional conditions to join to remove duplication.
@@ -266,3 +323,4 @@ for _,row in to_load.iterrows():
                 continue
             else:
                 raise err
+print(f'All data loaded')
