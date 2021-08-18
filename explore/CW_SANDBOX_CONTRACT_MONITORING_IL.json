@@ -5,7 +5,38 @@
     "columnsSelection": {
       "mode": "ALL"
     },
-    "columnWidthsByName": {},
+    "columnWidthsByName": {
+      "bill_pfin": 113,
+      "bill_pfin_10trimmed": 158,
+      "provider_payee_name": 225,
+      "primy_prcg_prov_spclty_cd": 203,
+      "dw_mbr_key": 155,
+      "gndr_cd": 100,
+      "mbr_zip": 100,
+      "mbr_city": 134,
+      "ACCT_NAME": 300,
+      "claim_line_key": 148,
+      "dw_clm_key": 127,
+      "li_num": 100,
+      "incurd_dt": 183,
+      "incurd_month": 183,
+      "hcpcs_cpt_cd": 105,
+      "HCPCS_CPT_Code_Desc": 300,
+      "rvnu_cd": 100,
+      "RevCD_Desc": 300,
+      "HCPC_OR_REV_DESC": 300,
+      "prim_diag": 300,
+      "ICD-10-CM Codes Description": 300,
+      "CCSR Category Description": 300,
+      "DRG_CD": 100,
+      "billd_amt": 100,
+      "prov_alwd_amt": 113,
+      "net_elig_amt": 105,
+      "net_elig_rd_amt": 128,
+      "net_pd_rd_amt": 113,
+      "Net_Elig_or_RD": 120,
+      "LOS": 100
+    },
     "coloring": {
       "scheme": "MEANING_AND_STATUS",
       "individualColumns": [],
@@ -27,20 +58,22 @@
           "enabled": false,
           "rules": []
         },
-        "samplingMethod": "HEAD_SEQUENTIAL",
-        "maxRecords": 10000,
+        "samplingMethod": "RANDOM_FIXED_NB_EXACT",
+        "maxRecords": 2000,
         "targetRatio": 0.02,
         "withinFirstN": -1,
         "maxReadUncompressedBytes": -1
       },
       "autoRefreshSample": false,
-      "_refreshTrigger": 0
+      "_refreshTrigger": 1
     },
     "vizSampling": {
       "autoRefreshSample": false,
       "_refreshTrigger": 0
     },
-    "exploreUIParams": {},
+    "exploreUIParams": {
+      "autoRefresh": true
+    },
     "globalSearchQuery": "",
     "explorationFilters": [],
     "previewMode": "ALL_ROWS"
@@ -117,6 +150,7 @@
           "defaultRadius": 5.0,
           "singleShape": "FILLED_CIRCLE"
         },
+        "computeMode": "NORMAL",
         "xAxisMode": "NORMAL",
         "yAxisMode": "NORMAL",
         "pieOptions": {
