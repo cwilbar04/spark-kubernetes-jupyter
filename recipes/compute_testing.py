@@ -62,6 +62,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             li_num DECIMAL(4,0),
             incurd_dt DATE FORMAT 'YY/MM/DD',
             incurd_month DATE FORMAT 'YY/MM/DD',
+            inpat_outpat_cd 
             hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN NOT CASESPECIFIC,
             HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             rvnu_cd CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC,
