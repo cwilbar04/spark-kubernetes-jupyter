@@ -9,7 +9,23 @@
   "projectType": "REGULAR",
   "projectAppType": "REGULAR",
   "owner": "U429930",
-  "permissions": [],
+  "permissions": [
+    {
+      "group": "PNDS",
+      "admin": true,
+      "readProjectContent": false,
+      "writeProjectContent": true,
+      "exportDatasetsData": true,
+      "readDashboards": false,
+      "writeDashboards": false,
+      "moderateDashboards": false,
+      "runScenarios": false,
+      "manageDashboardAuthorizations": false,
+      "manageExposedElements": false,
+      "manageAdditionalDashboardUsers": false,
+      "executeApp": false
+    }
+  ],
   "additionalDashboardUsers": {
     "users": []
   },
@@ -180,11 +196,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 1,
+    "versionNumber": 2,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1629305329534
+    "lastModifiedOn": 1630076045711
   },
   "creationTag": {
     "versionNumber": 0,
