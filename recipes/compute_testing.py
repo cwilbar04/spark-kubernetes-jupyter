@@ -182,7 +182,7 @@ for _,row in missing_data.iterrows():
                                  },ignore_index=True)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-to_load
+#to_load
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 to_load['bill_pfin'] = to_load['bill_pfin'].astype(str).str.zfill(13)
@@ -234,12 +234,12 @@ for _,row in to_load.iterrows():
             , clm_li.HCPCS_CPT_Cd
             , clm_li.primy_diag_cd
 --            , rd.tos_cat
-            , ROUND(ZEROIFNULL(clm_li.net_elig_amt)/
+            , ROUND(ZEROIFNULL(ZEROIFNULL(clm_li.net_elig_amt)/
                 NULLIFZERO((sum(clm_li.net_elig_amt) OVER (
                 PARTITION BY
                     clm_li.dw_clm_key, clm_li.hcpcs_cpt_cd, clm_li.svc_from_dt
                     , clm_li.svc_to_dt, clm_li.pd_dt, clm_li.rvnu_cd
-                ))),2) as net_elig_proportion
+                )))),2) as net_elig_proportion
             , rd.net_elig_rd_amt as net_elig_rd_amt_psi
             , rd.net_pd_rd_amt as net_pd_rd_amt_psi
             , clm_li.billd_amt
@@ -254,7 +254,8 @@ for _,row in to_load.iterrows():
             and clm_li.hcpcs_cpt_cd = rd.hcpcs_cpt_cd
             and clm_li.svc_from_dt = rd.svc_from_dt
             and clm_li.svc_to_dt = rd.svc_to_dt
-            and clm_li.pd_dt = rd.pd_dt
+         --   and clm_li.plc_of_trmnt_cd = rd.plc_of_trmnt_cd
+         --   and clm_li.pd_dt = rd.pd_dt
             and clm_li.rvnu_cd = rd.rvnu_cd
             and rd.pd_thru_dt = '9999-12-31'
         WHERE
