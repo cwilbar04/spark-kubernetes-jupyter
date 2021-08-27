@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 4,
+    "versionNumber": 5,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630075838156
+    "lastModifiedOn": 1630075854121
   },
   "creationTag": {
     "versionNumber": 0,
@@ -117,6 +117,11 @@
         "maxLength": 50
       },
       {
+        "name": "dw_clm_cntrl_key",
+        "type": "double",
+        "originalType": "DECIMAL"
+      },
+      {
         "name": "claim_line_key",
         "type": "string",
         "originalType": "VARCHAR",
@@ -143,6 +148,12 @@
         "type": "date",
         "originalType": "DATE",
         "timestampNoTzAsDate": true
+      },
+      {
+        "name": "inpat_outpat_cd",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 1
       },
       {
         "name": "hcpcs_cpt_cd",
@@ -196,8 +207,13 @@
         "name": "DRG_CD",
         "type": "string",
         "originalType": "CHAR",
-        "meaning": "Text",
         "maxLength": 3
+      },
+      {
+        "name": "tos_cat",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 255
       },
       {
         "name": "billd_amt",
@@ -225,7 +241,7 @@
         "originalType": "DECIMAL"
       },
       {
-        "name": "Net_Elig_or_RD",
+        "name": "Net_Elig_or_RD_pd",
         "type": "double",
         "originalType": "DECIMAL"
       },
