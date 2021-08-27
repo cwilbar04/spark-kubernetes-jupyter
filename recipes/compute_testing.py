@@ -367,11 +367,11 @@ for _,row in to_load.iterrows():
             all_claims_with_rd acrd
             LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = acrd.primy_diag_cd -- Code descriptions joined to RADAR views.
 
- /*           LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
+            LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
                 and cpt_code.column_name = 'hcpcs_cpt_cd'
                 and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
-  */
-              LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
+
+            LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
                 and diag.column_name = 'diag_cd'
                 and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
             LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
@@ -401,7 +401,6 @@ for _,row in to_load.iterrows():
             -- Currently just getting the DRG Code.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
                 and clmdrg.DRG_TYP_CD = 'D'
-
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
