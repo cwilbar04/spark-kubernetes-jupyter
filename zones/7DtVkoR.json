@@ -11,10 +11,6 @@
       "objectType": "DATASET"
     },
     {
-      "objectId": "compute_CW_IL_CONTRACT_MONITORING",
-      "objectType": "RECIPE"
-    },
-    {
       "objectId": "CW_IL_CONTRACT_MONITORING",
       "objectType": "DATASET"
     }
