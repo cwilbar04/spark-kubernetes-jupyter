@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 1,
+    "versionNumber": 2,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630339848044
+    "lastModifiedOn": 1630341543874
   },
   "creationTag": {
     "versionNumber": 0,
@@ -47,7 +47,7 @@
     "primaryIndexBehavior": "AUTO",
     "primaryIndexIsUnique": false,
     "primaryIndexColumns": [],
-    "connection": "Teradata_PROD",
+    "connection": "PROD_RADAR",
     "notReadyIfEmpty": false,
     "mode": "table",
     "partitioningType": "custom",
