@@ -1,12 +1,7 @@
 {
   "name": "Initial Create",
   "color": "#C82423",
-  "items": [
-    {
-      "objectId": "CW_SANDBOX_CONTRACT_MONITORING_IL_CREATE_TABLE",
-      "objectType": "DATASET"
-    }
-  ],
+  "items": [],
   "shared": [],
   "tags": [],
   "customFields": {},
