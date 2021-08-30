@@ -5,10 +5,6 @@
     {
       "objectId": "CW_SANDBOX_CONTRACT_MONITORING_IL_CREATE_TABLE",
       "objectType": "DATASET"
-    },
-    {
-      "objectId": "CW_IL_CONTRACT_MONITORING",
-      "objectType": "DATASET"
     }
   ],
   "shared": [],
