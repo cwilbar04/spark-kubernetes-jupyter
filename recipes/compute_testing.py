@@ -200,27 +200,27 @@ for _,row in to_load.iterrows():
             INSERT INTO {output_table_name}
     WITH all_claims_with_rd AS (
         SELECT b.*
-            ,CASE 
-            	WHEN claim_type = 'institutional_outpatient_visit' THEN           	
-	            	sum(net_elig_proportion) OVER
-		                (PARTITION BY dw_clm_key, hcpcs_cpt_cd, svc_from_dt, svc_to_dt, rvnu_cd ) 
-	            WHEN claim_type = 'institutional_inpatient_admission' THEN 
-	            	sum(net_elig_proportion) OVER
-		                (PARTITION BY dw_clm_key) 
-		        ELSE 1
-		     END as proportion_total
-            ,CASE 
-            	WHEN claim_type = 'institutional_outpatient_visit' THEN    
-		            ROW_NUMBER() OVER 
-		            	(PARTITION BY dw_clm_key, hcpcs_cpt_cd, svc_from_dt
-		                    , svc_to_dt, rvnu_cd
-		                 ORDER BY li_num) 
-		        WHEN claim_type in ('institutional_inpatient_admission') THEN         
-		            ROW_NUMBER() OVER 
-		            	(PARTITION BY dw_clm_key
-		                 ORDER BY li_num) 		           		      
-		        ELSE 0
-		     END as line_number_order
+            ,CASE
+                WHEN claim_type = 'institutional_outpatient_visit' THEN
+                    sum(net_elig_proportion) OVER
+                        (PARTITION BY dw_clm_key, hcpcs_cpt_cd, svc_from_dt, svc_to_dt, rvnu_cd )
+                WHEN claim_type = 'institutional_inpatient_admission' THEN
+                    sum(net_elig_proportion) OVER
+                        (PARTITION BY dw_clm_key)
+                ELSE 1
+             END as proportion_total
+            ,CASE
+                WHEN claim_type = 'institutional_outpatient_visit' THEN
+                    ROW_NUMBER() OVER
+                        (PARTITION BY dw_clm_key, hcpcs_cpt_cd, svc_from_dt
+                            , svc_to_dt, rvnu_cd
+                         ORDER BY li_num)
+                WHEN claim_type in ('institutional_inpatient_admission') THEN
+                    ROW_NUMBER() OVER
+                        (PARTITION BY dw_clm_key
+                         ORDER BY li_num)
+                ELSE 0
+             END as line_number_order
             ,CASE
                 WHEN line_number_order = 1 THEN net_elig_proportion + (1-proportion_total)
                 ELSE net_elig_proportion
@@ -228,114 +228,114 @@ for _,row in to_load.iterrows():
             ,net_pd_rd_amt_psi * actual_proportion as net_pd_rd_amt
             ,net_elig_rd_amt_psi * actual_proportion as net_elig_rd_amt
         FROM
-        	(
-	        SELECT
-	        	a.*
-	        	, ROUND(
-	            	CASE
-	            		WHEN claim_type = 'institutional_outpatient_visit' THEN 
-			            	ZEROIFNULL(
-			            		ZEROIFNULL(net_elig_amt)
-			            			/
-			                	NULLIFZERO(sum(net_elig_amt) OVER (
-			                				PARTITION BY
-						                   	dw_clm_key
-						                    , hcpcs_cpt_cd
-						                    , svc_from_dt
-						                    , svc_to_dt
-						                    , rvnu_cd
-			                	))
-			                	)
-			            WHEN claim_type = 'institutional_inpatient_admission' THEN 
-			            	ZEROIFNULL(
-			            		ZEROIFNULL(net_elig_amt)
-			            			/
-			                	NULLIFZERO((sum(net_elig_amt) OVER (
-			                				PARTITION BY
-						                    dw_clm_key
-			                	)))
-			                	)		         
-			       		ELSE 1
-			       	END 
-			       ,2) as net_elig_proportion
-			FROM
-		        
-		        (
-		        SELECT
-		        	DISTINCT
-		            prov.prov_fincl_id
-		            , ck.provider_payee_name
-		            , prov.primy_prcg_prov_spclty_cd
-		    --- Member Info ---
-		            , ck.dw_mbr_key
-		            , ck.dw_acct_key
-		     --- Claim Info ---
-		            , ck.dw_clm_cntrl_key
-		            , ck.dw_clm_key
-		            , clm_li.Li_num
-		            , concat(to_char(clm_li.dw_clm_key),'-',to_char(clm_li.Li_num)) as "claim_line_key"
-		            , ck.incurd_dt
-		            , clm_li.inpat_outpat_cd
-		            , clm_li.svc_from_dt
-		            , clm_li.svc_to_dt
-		            , clm_li.pd_dt
-		            , clm_li.rvnu_cd
-		            , clm_li.HCPCS_CPT_Cd
-		            , clm_li.primy_diag_cd
-		            , CASE 
-		            	WHEN clm_li.clm_filing_cd = '01' THEN 
-		            		CASE 
-				            	WHEN vi.dw_clm_key is not NULL THEN 'institutional_outpatient_visit'
-				            	WHEN adm.dw_clm_key is not NULL THEN 'institutional_inpatient_admission'
-				            	WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
-		            			ELSE 'other_institutional'
-		            		END
-		            	WHEN clm_li.clm_filing_cd = '02' THEN 'professional'
-		            	ELSE 'other_not_01_or_02_why'
-		            END as claim_type          	
-		--            , rd.tos_cat
-		            -- Outpatient visits in DSL can be split in to multiple lines with the same values for all
-				    -- of the join columns if the GRVU can only be calculated for a portion of a visit that would
-				    -- otherwise normally be grouped together. In this case, the RD amounts are split across these
-				    -- two lines so we need to sum across this partition and select distinct values only
-				    , COALESCE(sum(vi.net_elig_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
-		            		, adm.net_elig_rd_amt
-		            		, ipn.net_elig_rd_amt) as net_elig_rd_amt_psi
-		            , COALESCE(sum(vi.net_pd_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
-		            	, adm.net_pd_rd_amt
-		            	, ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
-		            , clm_li.billd_amt
-		            , clm_li.prov_alwd_amt
-		            , clm_li.net_elig_amt
-		        FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
-		        INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
-		            AND ck.source_schema_cd = clm_li.source_schema_cd
-		        INNER JOIN RADAR_VIEWS.radardm_prod_provider prov on ck.billing_dw_prov_fincl_key = prov.dw_prov_fincl_key
-		        LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit vi ON
-		            vi.dw_clm_key = ck.dw_clm_key
-		            and clm_li.hcpcs_cpt_cd = vi.hcpcs_cpt_cd
-		            and clm_li.svc_from_dt = vi.svc_from_dt
-		            and clm_li.svc_to_dt = vi.svc_to_dt
-		            and clm_li.rvnu_cd = vi.rvnu_cd
-		            and vi.pd_thru_dt = DATE '9999-12-31'
-		        LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
-		        	adm.dw_clm_key = ck.dw_clm_key
-		        	and adm.pd_thru_dt = DATE '9999-12-31'
-		        LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
-		        	ipn.dw_clm_key = ck.dw_clm_key
-		        	and ipn.li_num = clm_li.li_num
-		        	and ipn.pd_thru_dt = DATE '9999-12-31'
-		        WHERE
-		            ck.disp_cd = 'A'
-		            AND clm_li.disp_cd = 'A'
-		            AND ck.incurd_dt >= '{datetime.strftime(start_date,"%Y-%m-%d")}' 
-   					AND ck.incurd_dt < '{datetime.strftime(end_date,"%Y-%m-%d")}'
-		            AND ck.source_schema_cd = 'IL'
-		            AND ck.home_host_local_ind in ('HOME', 'LOCAL')
-		            AND prov.prov_fincl_id = '{pfin}'  -- Really important to not use the trimmed calculation
-		       
-		    ) a
-		) b
+            (
+            SELECT
+                a.*
+                , ROUND(
+                    CASE
+                        WHEN claim_type = 'institutional_outpatient_visit' THEN
+                            ZEROIFNULL(
+                                ZEROIFNULL(net_elig_amt)
+                                    /
+                                NULLIFZERO(sum(net_elig_amt) OVER (
+                                            PARTITION BY
+                                            dw_clm_key
+                                            , hcpcs_cpt_cd
+                                            , svc_from_dt
+                                            , svc_to_dt
+                                            , rvnu_cd
+                                ))
+                                )
+                        WHEN claim_type = 'institutional_inpatient_admission' THEN
+                            ZEROIFNULL(
+                                ZEROIFNULL(net_elig_amt)
+                                    /
+                                NULLIFZERO((sum(net_elig_amt) OVER (
+                                            PARTITION BY
+                                            dw_clm_key
+                                )))
+                                )
+                        ELSE 1
+                    END
+                   ,2) as net_elig_proportion
+            FROM
+
+                (
+                SELECT
+                    DISTINCT
+                    prov.prov_fincl_id
+                    , ck.provider_payee_name
+                    , prov.primy_prcg_prov_spclty_cd
+            --- Member Info ---
+                    , ck.dw_mbr_key
+                    , ck.dw_acct_key
+             --- Claim Info ---
+                    , ck.dw_clm_cntrl_key
+                    , ck.dw_clm_key
+                    , clm_li.Li_num
+                    , concat(to_char(clm_li.dw_clm_key),'-',to_char(clm_li.Li_num)) as "claim_line_key"
+                    , ck.incurd_dt
+                    , clm_li.inpat_outpat_cd
+                    , clm_li.svc_from_dt
+                    , clm_li.svc_to_dt
+                    , clm_li.pd_dt
+                    , clm_li.rvnu_cd
+                    , clm_li.HCPCS_CPT_Cd
+                    , clm_li.primy_diag_cd
+                    , CASE
+                        WHEN clm_li.clm_filing_cd = '01' THEN
+                            CASE
+                                WHEN vi.dw_clm_key is not NULL THEN 'institutional_outpatient_visit'
+                                WHEN adm.dw_clm_key is not NULL THEN 'institutional_inpatient_admission'
+                                WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
+                                ELSE 'other_institutional'
+                            END
+                        WHEN clm_li.clm_filing_cd = '02' THEN 'professional'
+                        ELSE 'other_not_01_or_02_why'
+                    END as claim_type
+        --            , rd.tos_cat
+                    -- Outpatient visits in DSL can be split in to multiple lines with the same values for all
+                    -- of the join columns if the GRVU can only be calculated for a portion of a visit that would
+                    -- otherwise normally be grouped together. In this case, the RD amounts are split across these
+                    -- two lines so we need to sum across this partition and select distinct values only
+                    , COALESCE(sum(vi.net_elig_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
+                            , adm.net_elig_rd_amt
+                            , ipn.net_elig_rd_amt) as net_elig_rd_amt_psi
+                    , COALESCE(sum(vi.net_pd_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
+                        , adm.net_pd_rd_amt
+                        , ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
+                    , clm_li.billd_amt
+                    , clm_li.prov_alwd_amt
+                    , clm_li.net_elig_amt
+                FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
+                INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
+                    AND ck.source_schema_cd = clm_li.source_schema_cd
+                INNER JOIN RADAR_VIEWS.radardm_prod_provider prov on ck.billing_dw_prov_fincl_key = prov.dw_prov_fincl_key
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit vi ON
+                    vi.dw_clm_key = ck.dw_clm_key
+                    and clm_li.hcpcs_cpt_cd = vi.hcpcs_cpt_cd
+                    and clm_li.svc_from_dt = vi.svc_from_dt
+                    and clm_li.svc_to_dt = vi.svc_to_dt
+                    and clm_li.rvnu_cd = vi.rvnu_cd
+                    and vi.pd_thru_dt = DATE '9999-12-31'
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
+                    adm.dw_clm_key = ck.dw_clm_key
+                    and adm.pd_thru_dt = DATE '9999-12-31'
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
+                    ipn.dw_clm_key = ck.dw_clm_key
+                    and ipn.li_num = clm_li.li_num
+                    and ipn.pd_thru_dt = DATE '9999-12-31'
+                WHERE
+                    ck.disp_cd = 'A'
+                    AND clm_li.disp_cd = 'A'
+                    AND ck.incurd_dt >= '{datetime.strftime(start_date,"%Y-%m-%d")}'
+                    AND ck.incurd_dt < '{datetime.strftime(end_date,"%Y-%m-%d")}'
+                    AND ck.source_schema_cd = 'IL'
+                    AND ck.home_host_local_ind in ('HOME', 'LOCAL')
+                    AND prov.prov_fincl_id = '{pfin}'  -- Really important to not use the trimmed calculation
+
+            ) a
+        ) b
     ), mbr_info AS (
         SELECT
             mbr.dw_mbr_key
