@@ -139,8 +139,9 @@
       }
     }
   },
-  "name": "IL Contract Monitoring - Testing",
+  "name": "IL Contract Monitoring",
   "projectStatus": "Sandbox",
+  "imgPattern": 6,
   "metrics": {
     "probes": [],
     "engineConfig": {
@@ -196,11 +197,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 2,
+    "versionNumber": 5,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630076045711
+    "lastModifiedOn": 1630692778614
   },
   "creationTag": {
     "versionNumber": 0,
