@@ -35,7 +35,11 @@
       "net_elig_rd_amt": 128,
       "net_pd_rd_amt": 113,
       "Net_Elig_or_RD": 120,
-      "LOS": 100
+      "LOS": 100,
+      "dw_clm_cntrl_key": 162,
+      "inpat_outpat_cd": 128,
+      "tos_cat": 300,
+      "Net_Elig_or_RD_pd": 143
     },
     "coloring": {
       "scheme": "MEANING_AND_STATUS",
@@ -65,7 +69,7 @@
         "maxReadUncompressedBytes": -1
       },
       "autoRefreshSample": false,
-      "_refreshTrigger": 3
+      "_refreshTrigger": 4
     },
     "vizSampling": {
       "autoRefreshSample": false,
