@@ -73,7 +73,10 @@ if recipe_vars['drop_and_recreate_table'] is True:
             "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
-            tos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC, -- DSL category. comment out futher testing needed
+            tos_cat_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+            tos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            pos_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
+            pos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             --FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC, -- commented out for now. need to solve duplication issues before including if needed in future
             --FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             billd_amt DECIMAL(11,2),
