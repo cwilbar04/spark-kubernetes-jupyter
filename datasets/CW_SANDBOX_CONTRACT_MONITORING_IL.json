@@ -25,19 +25,14 @@
   "partitioning": {
     "ignoreNonMatchingFile": false,
     "considerMissingRequestedPartitionsAsEmpty": false,
-    "dimensions": [
-      {
-        "name": "",
-        "type": "value"
-      }
-    ]
+    "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 7,
+    "versionNumber": 8,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631552079467
+    "lastModifiedOn": 1631552380210
   },
   "creationTag": {
     "versionNumber": 0,
@@ -212,7 +207,6 @@
         "name": "DRG_CD",
         "type": "string",
         "originalType": "CHAR",
-        "meaning": "Text",
         "maxLength": 3
       },
       {
