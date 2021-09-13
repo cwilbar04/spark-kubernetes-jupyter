@@ -302,15 +302,20 @@ for _,row in to_load.iterrows():
                             , adm.net_elig_rd_amt
                             , ipn.net_elig_rd_amt) as net_elig_rd_amt_psi
                     , COALESCE(sum(vi.net_pd_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
-                        , adm.net_pd_rd_amt
-                        , ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
+		                    , adm.net_pd_rd_amt
+		                    , ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
                     , clm_li.billd_amt
                     , clm_li.prov_alwd_amt
                     , clm_li.net_elig_amt
+                    , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
+                    , COALESCE (vi_tos_cat_desc.code_txt, adm_tos_cat_desc.code_txt, ipn_tos_cat_desc.code_txt, proc_tos_cat_desc.code_txt) as tos_cat
+                    , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
+                    , COALESCE (vi_pos_cat_desc.code_txt, adm_pos_cat_desc.code_txt, ipn_pos_cat_desc.code_txt, proc_pos_cat_desc.code_txt) as pos_cat
                 FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
                 INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
                     AND ck.source_schema_cd = clm_li.source_schema_cd
                 INNER JOIN RADAR_VIEWS.radardm_prod_provider prov on ck.billing_dw_prov_fincl_key = prov.dw_prov_fincl_key
+                -- Insitutional Outpatient Visits
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit vi ON
                     vi.dw_clm_key = ck.dw_clm_key
                     and clm_li.hcpcs_cpt_cd = vi.hcpcs_cpt_cd
@@ -318,13 +323,65 @@ for _,row in to_load.iterrows():
                     and clm_li.svc_to_dt = vi.svc_to_dt
                     and clm_li.rvnu_cd = vi.rvnu_cd
                     and vi.pd_thru_dt = DATE '9999-12-31'
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit_cat vi_cat ON
+                	vi_cat.dw_visit_key = vi.dw_visit_key
+                LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table vi_tos_cat_desc ON
+                	vi_cat.tos_cat = vi_tos_cat_desc.CODE_CD 
+                	AND vi_tos_cat_desc.COLUMN_NAME = 'tos_cat'
+                	AND vi_tos_cat_desc.CODE_CLM_TYP ='Outpatient'
+                LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table vi_pos_cat_desc ON
+                	vi_cat.pos_cat = vi_pos_cat_desc.CODE_CD 
+                	AND vi_pos_cat_desc.COLUMN_NAME = 'pos_cat'
+                	AND vi_pos_cat_desc.CODE_CLM_TYP ='Outpatient'
+                	
+                -- Institutional Inpatient Admissions	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
                     adm.dw_clm_key = ck.dw_clm_key
                     and adm.pd_thru_dt = DATE '9999-12-31'
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm_cat adm_cat ON
+                	adm_cat.dw_adm_key = adm.dw_adm_key
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table adm_tos_cat_desc ON
+	            	adm_cat.tos_cat = adm_tos_cat_desc.CODE_CD 
+	            	AND adm_tos_cat_desc.COLUMN_NAME = 'tos_cat'
+	            	AND adm_tos_cat_desc.CODE_CLM_TYP ='Inpatient'               	
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table adm_pos_cat_desc ON
+	            	adm_cat.pos_cat = adm_pos_cat_desc.CODE_CD 
+	            	AND adm_pos_cat_desc.COLUMN_NAME = 'pos_cat'
+	            	AND adm_pos_cat_desc.CODE_CLM_TYP ='Inpatient'      
+	            	
+                -- Institutional Inpatient Non-Admission Claims	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
                     ipn.dw_clm_key = ck.dw_clm_key
                     and ipn.li_num = clm_li.li_num
                     and ipn.pd_thru_dt = DATE '9999-12-31'
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_cat ipn_cat ON
+                	ipn_cat.dw_clm_key = ipn.dw_clm_key
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table ipn_tos_cat_desc ON
+	            	ipn_cat.tos_cat = ipn_tos_cat_desc.CODE_CD 
+	            	AND ipn_tos_cat_desc.COLUMN_NAME = 'tos_cat'
+	            	AND ipn_tos_cat_desc.CODE_CLM_TYP ='Inpatient'       
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table ipn_pos_cat_desc ON
+	            	ipn_cat.tos_cat = ipn_pos_cat_desc.CODE_CD 
+	            	AND ipn_pos_cat_desc.COLUMN_NAME = 'pos_cat'
+	            	AND ipn_pos_cat_desc.CODE_CLM_TYP ='Inpatient'   
+	            	
+                -- Professional Claims
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_clm_li proc ON
+                    proc.dw_clm_key = ck.dw_clm_key
+                    and proc.li_num = clm_li.li_num
+                    and proc.pd_thru_dt = DATE '9999-12-31'	
+				LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_cat proc_cat ON
+					proc_cat.dw_clm_key = proc.dw_clm_key
+					and proc_cat.li_num = proc.li_num
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table proc_tos_cat_desc ON
+	            	proc_cat.tos_cat = proc_tos_cat_desc.CODE_CD 
+	            	AND proc_tos_cat_desc.COLUMN_NAME = 'tos_cat'
+	            	AND proc_tos_cat_desc.CODE_CLM_TYP ='Professional'      
+	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table proc_pos_cat_desc ON
+	            	proc_cat.tos_cat = proc_pos_cat_desc.CODE_CD 
+	            	AND proc_pos_cat_desc.COLUMN_NAME = 'pos_cat'
+	            	AND proc_pos_cat_desc.CODE_CLM_TYP ='Professional'      
+	            	
                 WHERE
                     ck.disp_cd = 'A'
                     AND clm_li.disp_cd = 'A'
@@ -332,11 +389,12 @@ for _,row in to_load.iterrows():
                     AND ck.incurd_dt < '{datetime.strftime(end_date,"%Y-%m-%d")}'
                     AND ck.source_schema_cd = 'IL'
                     AND ck.home_host_local_ind in ('HOME', 'LOCAL')
-                    AND prov.prov_fincl_id = '{pfin}'  -- Really important to not use the trimmed calculation
+                    AND prov.prov_fincl_id = '{pfin}'
 
             ) a
         ) b
-    ), mbr_info AS (
+    ) 
+    , mbr_info AS (
         SELECT
             mbr.dw_mbr_key
             , mbr.gndr_cd
@@ -409,7 +467,10 @@ for _,row in to_load.iterrows():
             , ccs2.diag_desc as "ICD-10-CM Codes Description"
             , ccs2.CCS_desc as "CCSR Category Description"
             , clmdrg.drg_cd
-            , 'not yet implemented' as tos_cat -- DSL category.
+            , acrd.tos_cat_cd
+            , acrd.tos_cat
+            , acrd.pos_cat_cd
+            , acrd.pos_cat
             --, plcy.FINCL_ARNGMT_CD -- commented out for now. need to solve duplication issues before including if needed in future
             --, plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
             , acrd.billd_amt
@@ -430,7 +491,6 @@ for _,row in to_load.iterrows():
             LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
                 and cpt_code.column_name = 'hcpcs_cpt_cd'
                 and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
-
             LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
                 and diag.column_name = 'diag_cd'
                 and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
@@ -460,7 +520,7 @@ for _,row in to_load.iterrows():
                 and acct.now_ind = 'Y'
             -- Currently just getting the DRG Code.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
-                and clmdrg.DRG_TYP_CD = 'D'
+                and clmdrg.DRG_TYP_CD = 'H';
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
