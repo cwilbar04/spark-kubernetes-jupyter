@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 9,
+    "versionNumber": 10,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631720731927
+    "lastModifiedOn": 1631720848367
   },
   "creationTag": {
     "versionNumber": 0,
@@ -52,7 +52,7 @@
     "mode": "table",
     "partitioningType": "custom",
     "normalizeDoubles": true,
-    "table": "${PREFIX}contract_monitoring${SUFFIX}",
+    "table": "${PREFIX}CONTRACT_MONITORING${SUFFIX}",
     "schema": "${DATABASE}",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
