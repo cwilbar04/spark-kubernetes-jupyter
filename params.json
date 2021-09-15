@@ -139,7 +139,7 @@
       }
     }
   },
-  "name": "IL Contract Monitoring",
+  "name": "IL Contract Monitoring (dev)",
   "imgPattern": 6,
   "metrics": {
     "probes": [],
@@ -196,11 +196,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 6,
+    "versionNumber": 7,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631719955913
+    "lastModifiedOn": 1631719958402
   },
   "creationTag": {
     "versionNumber": 0,
@@ -209,7 +209,7 @@
     },
     "lastModifiedOn": 1628004703174
   },
-  "shortDesc": "The project *IL Contract Monitoring - Testing* was created by Chris Wilbar on Aug 03rd 2021",
+  "shortDesc": "The project *IL Contract Monitoring - Testing* was created by Chris Wilbar on Aug 03rd 2021\nThe project *IL_CONTRACT_MONITORING_DEV* was copied from *ILCONTRACTMONITORINGTESTING* by Chris Wilbar on Sep 15th 2021",
   "tags": [
     "duplicated"
   ],
