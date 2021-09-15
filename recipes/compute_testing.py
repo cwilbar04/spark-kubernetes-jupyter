@@ -319,9 +319,7 @@ for _,row in to_load.iterrows():
                     	ELSE 'Not in DSL'
                     END as "DSL_CLM_TYP"
                     , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
---                    , COALESCE (vi_tos_cat_desc.code_txt, adm_tos_cat_desc.code_txt, ipn_tos_cat_desc.code_txt, proc_tos_cat_desc.code_txt) as tos_cat
                     , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
---                    , COALESCE (vi_pos_cat_desc.code_txt, adm_pos_cat_desc.code_txt, ipn_pos_cat_desc.code_txt, proc_pos_cat_desc.code_txt) as pos_cat
                 FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
                 INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
                     AND ck.source_schema_cd = clm_li.source_schema_cd
@@ -336,29 +334,13 @@ for _,row in to_load.iterrows():
                     and vi.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit_cat vi_cat ON
                 	vi_cat.dw_visit_key = vi.dw_visit_key
---                LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table vi_tos_cat_desc ON
---                	vi_cat.tos_cat = vi_tos_cat_desc.CODE_CD 
---                	AND vi_tos_cat_desc.COLUMN_NAME = 'tos_cat'
---                	AND vi_tos_cat_desc.CODE_CLM_TYP ='Outpatient'
---                LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table vi_pos_cat_desc ON
---                	vi_cat.pos_cat = vi_pos_cat_desc.CODE_CD 
---                	AND vi_pos_cat_desc.COLUMN_NAME = 'pos_cat'
---                	AND vi_pos_cat_desc.CODE_CLM_TYP ='Outpatient'
                 	
                 -- Institutional Inpatient Admissions	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
                     adm.dw_clm_key = ck.dw_clm_key
                     and adm.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm_cat adm_cat ON
-                	adm_cat.dw_adm_key = adm.dw_adm_key
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table adm_tos_cat_desc ON
---	            	adm_cat.tos_cat = adm_tos_cat_desc.CODE_CD 
---	            	AND adm_tos_cat_desc.COLUMN_NAME = 'tos_cat'
---	            	AND adm_tos_cat_desc.CODE_CLM_TYP ='Inpatient'               	
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table adm_pos_cat_desc ON
---	            	adm_cat.pos_cat = adm_pos_cat_desc.CODE_CD 
---	            	AND adm_pos_cat_desc.COLUMN_NAME = 'pos_cat'
---	            	AND adm_pos_cat_desc.CODE_CLM_TYP ='Inpatient'      
+                	adm_cat.dw_adm_key = adm.dw_adm_key   
 	            	
                 -- Institutional Inpatient Non-Admission Claims	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
@@ -366,15 +348,7 @@ for _,row in to_load.iterrows():
                     and ipn.li_num = clm_li.li_num
                     and ipn.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_cat ipn_cat ON
-                	ipn_cat.dw_clm_key = ipn.dw_clm_key
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table ipn_tos_cat_desc ON
---	            	ipn_cat.tos_cat = ipn_tos_cat_desc.CODE_CD 
---	            	AND ipn_tos_cat_desc.COLUMN_NAME = 'tos_cat'
---	            	AND ipn_tos_cat_desc.CODE_CLM_TYP ='Inpatient'       
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table ipn_pos_cat_desc ON
---	            	ipn_cat.tos_cat = ipn_pos_cat_desc.CODE_CD 
---	            	AND ipn_pos_cat_desc.COLUMN_NAME = 'pos_cat'
---	            	AND ipn_pos_cat_desc.CODE_CLM_TYP ='Inpatient'   
+                	ipn_cat.dw_clm_key = ipn.dw_clm_key 
 	            	
                 -- Professional Claims
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_clm_li proc ON
@@ -383,15 +357,7 @@ for _,row in to_load.iterrows():
                     and proc.pd_thru_dt = DATE '9999-12-31'	
 				LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_cat proc_cat ON
 					proc_cat.dw_clm_key = proc.dw_clm_key
-					and proc_cat.li_num = proc.li_num
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table proc_tos_cat_desc ON
---	            	proc_cat.tos_cat = proc_tos_cat_desc.CODE_CD 
---	            	AND proc_tos_cat_desc.COLUMN_NAME = 'tos_cat'
---	            	AND proc_tos_cat_desc.CODE_CLM_TYP ='Professional'      
---	            LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table proc_pos_cat_desc ON
---	            	proc_cat.tos_cat = proc_pos_cat_desc.CODE_CD 
---	            	AND proc_pos_cat_desc.COLUMN_NAME = 'pos_cat'
---	            	AND proc_pos_cat_desc.CODE_CLM_TYP ='Professional'      
+					and proc_cat.li_num = proc.li_num 
 	            	
                 WHERE		            
                 	ck.disp_cd = 'A'
