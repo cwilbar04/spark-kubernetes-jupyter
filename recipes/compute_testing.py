@@ -359,11 +359,14 @@ for _,row in to_load.iterrows():
 					proc_cat.dw_clm_key = proc.dw_clm_key
 					and proc_cat.li_num = proc.li_num 
 	            	
-                WHERE		            
-                	ck.disp_cd = 'A'
-		            AND clm_li.disp_cd = 'A'
-		            AND ck.source_schema_cd = 'IL'
-		            AND ck.home_host_local_ind in ('HOME', 'LOCAL')		       
+                WHERE
+                    ck.disp_cd = 'A'
+                    AND clm_li.disp_cd = 'A'
+                    AND ck.incurd_dt >= '{datetime.strftime(start_date,"%Y-%m-%d")}'
+                    AND ck.incurd_dt < '{datetime.strftime(end_date,"%Y-%m-%d")}'
+                    AND ck.source_schema_cd = 'IL'
+                    AND ck.home_host_local_ind in ('HOME', 'LOCAL')
+                    AND prov.prov_fincl_id = '{pfin}'     
 		    ) a
 		) b
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table tos_cat_desc ON
