@@ -73,6 +73,8 @@ if recipe_vars['drop_and_recreate_table'] is True:
             "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+            maj_diag_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
+            "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             tos_cat_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
             tos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             pos_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
@@ -452,6 +454,8 @@ for _,row in to_load.iterrows():
             , ccs2.diag_desc as "ICD-10-CM Codes Description"
             , ccs2.CCS_desc as "CCSR Category Description"
             , clmdrg.drg_cd
+            , clmdrg.maj_diag_cat_cd
+            , mdc.code_txt as "Major Diagnostic Category (MDC)"
             , acrd.tos_cat_cd
             , acrd.tos_cat
             , acrd.pos_cat_cd
@@ -474,13 +478,13 @@ for _,row in to_load.iterrows():
             LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = acrd.primy_diag_cd -- Code descriptions joined to RADAR views.
 
             LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
-                and cpt_code.column_name = 'hcpcs_cpt_cd'
+                and cpt_code.column_name = 'HCPCS_CPT_CD'
                 and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
             LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
-                and diag.column_name = 'diag_cd'
+                and diag.column_name = 'DIAG_CD'
                 and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
             LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
-                and rvcode.column_name = 'rvnu_cd'
+                and rvcode.column_name = 'RVNU_CD'
                 and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
 
             --- Base RADAR tables ---
@@ -505,7 +509,10 @@ for _,row in to_load.iterrows():
                 and acct.now_ind = 'Y'
             -- Currently just getting the DRG Code.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
-                and clmdrg.DRG_TYP_CD = 'H';
+                and clmdrg.DRG_TYP_CD = 'H'
+            LEFT JOIN code_table mdc ON mdc.CODE_CD = clmdrg.MAJ_DIAG_CAT_CD
+                and mdc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
+                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE ;
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
