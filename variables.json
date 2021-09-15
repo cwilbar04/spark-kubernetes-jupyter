@@ -1,4 +1,7 @@
 {
+  "DATABASE": "RADAR",
+  "PREFIX": "CW_RADAR_",
+  "SUFFIX": "IL",
   "prov_finc_id_list_all": [
     "0000000000331",
     "0000000000087",
