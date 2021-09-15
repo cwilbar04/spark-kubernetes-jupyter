@@ -1,4 +1,5 @@
 {
+  "drop_and_recreate_table": true,
   "DATABASE": "RADAR",
   "PREFIX": "CW_RADAR_",
   "SUFFIX": "_IL",
@@ -16,5 +17,5 @@
   "prov_finc_id": "",
   "start_date": "2018-07-01",
   "end_date": "2021-12-31",
-  "drop_and_recreate_table": true
+  "a": "a"
 }
