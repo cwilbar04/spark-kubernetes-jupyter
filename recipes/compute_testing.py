@@ -45,7 +45,8 @@ if recipe_vars['drop_and_recreate_table'] is True:
             --- Provider Info ---
             bill_pfin VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
             bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
-            provider_payee_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC, -- why would billing provider be different than payee provider? Which one are we actually supposed to be monitoring here?
+            provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+            provider_payee_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
             primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
 
             --- Member Info ---
@@ -272,6 +273,7 @@ for _,row in to_load.iterrows():
                 SELECT
                     DISTINCT
                     prov.prov_fincl_id
+                    , prov.prov_name
                     , ck.provider_payee_name
                     , prov.primy_prcg_prov_spclty_cd
             --- Member Info ---
@@ -423,6 +425,7 @@ for _,row in to_load.iterrows():
                 WHEN LENGTH(acrd.prov_fincl_id) > 10 THEN RIGHT(acrd.prov_fincl_id, 10)
                 ELSE acrd.prov_fincl_id
             END as "bill_pfin_10trimmed"
+            , acrd.prov_name as "provider_bill_pfin_name"
             , acrd.provider_payee_name
             , acrd.primy_prcg_prov_spclty_cd
 
