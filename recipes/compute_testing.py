@@ -74,6 +74,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+            "DRG Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             maj_diag_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
             "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             tos_cat_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
@@ -415,7 +416,56 @@ for _,row in to_load.iterrows():
         column_name in(
         'HCPCS_CPT_CD',
         'DIAG_CD',
-        'RVNU_CD'))
+        'RVNU_CD')
+   ), drg_codes AS (
+   SELECT
+        DISTINCT	
+        CASE
+            WHEN "MDC_CD" = 'PRE' THEN 'PRE-MDC'
+            ELSE COALESCE(mdc_desc.CODE_TXT,'NO MDC AVAILABLE')
+        END as "MDC Description"
+        , a.MDC_CD
+        , a."DRG_CD"
+        , a."DRG Description"
+    --	, CASE 
+    --		WHEN INSTR(a."DRG Description",' WITH ') > 0 THEN LEFT(a."DRG Description", 10 --INSTR(a."DRG Description",' WITH ')
+    --		) 
+    --		--WHEN INSTR(a."DRG Description",' WITHOUT ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' WITHOUT ')) 
+    --		--WHEN INSTR(a."DRG Description",' W ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' W ')) 
+    --	--	WHEN INSTR(a."DRG Description",' W/O ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' W/O ')) 
+    --		ELSE a."DRG Description"
+    --	END as "Base DRG Description" 
+    FROM
+        (
+        SELECT 
+                MAJ_DIAG_CAT_CD,
+                dcd.MDC as "CMS_MDC_VERSION",
+                dcd_most_recent.MDC as "CMS_MDC_MOST_RECENT_VERSION",
+                CASE 
+                    WHEN dcd_most_recent.MS_DRG_TITLE is NULL THEN dcd.MDC
+                    ELSE dcd_most_recent.MDC
+                END as "MDC_CD",
+                DRG_CD,
+                DRG_GRPR_VRSN_NUM,
+                dcd.MS_DRG_TITLE as "CMS_VERSION_DRG_DESCRIPTION",
+                dcd_most_recent.MS_DRG_TITLE as "CMS_MOST_RECENT_VERSION_DRG_DESCRIPTION",
+                COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"	
+            FROM ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
+            LEFT JOIN PANDA.DRG_CMS_DATA dcd
+                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd.MS_DRG_SPEC_GRP), 3)
+                AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN 
+                AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
+            LEFT JOIN PANDA.DRG_CMS_DATA dcd_most_recent
+                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd_most_recent.MS_DRG_SPEC_GRP), 3)
+                AND dcd_most_recent.CMS_DRG_VRSN = 38
+                AND dcd_most_recent.CMS_DRG_TYP = 'CN'
+            WHERE clmdrg.DRG_TYP_CD = 'H' and clmdrg.DRG_GRPR_VRSN_NUM > 34
+            --and EXISTS (SELECT 1 FROM "RADAR"."RADAR_CONTRACT_MONITORING_IL" a WHERE a.dw_clm_key = clmdrg.DW_CLM_KEY)
+            GROUP BY 1,2,3,4,5,6,7,8,9
+            ) a
+        LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE mdc_desc ON mdc_desc.CODE_CD = a.MDC_CD
+            AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'  
+   )
 
         SELECT
     --- Provider Info ---
@@ -457,8 +507,9 @@ for _,row in to_load.iterrows():
             , ccs2.diag_desc as "ICD-10-CM Codes Description"
             , ccs2.CCS_desc as "CCSR Category Description"
             , clmdrg.drg_cd
+            , drg_codes."DRG Description"
             , clmdrg.maj_diag_cat_cd
---            , mdc.code_txt as "Major Diagnostic Category (MDC)"
+            , drg_codes."MDC Description" as "Major Diagnostic Category (MDC)"
             , acrd.tos_cat_cd
             , acrd.tos_cat
             , acrd.pos_cat_cd
@@ -513,9 +564,8 @@ for _,row in to_load.iterrows():
             -- Currently just getting the DRG Code.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
                 and clmdrg.DRG_TYP_CD = 'H'
---            LEFT JOIN code_table mdc ON mdc.CODE_CD = clmdrg.MAJ_DIAG_CAT_CD
---                and mdc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
---                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE 
+            LEFT JOIN drg_codes ON clmdrg.DRG_CD = drg_codes.DRG_CD
+
                 ;
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
