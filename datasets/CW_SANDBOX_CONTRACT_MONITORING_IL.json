@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 10,
+    "versionNumber": 11,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631720848367
+    "lastModifiedOn": 1631809532154
   },
   "creationTag": {
     "versionNumber": 0,
@@ -210,7 +210,25 @@
         "maxLength": 3
       },
       {
+        "name": "tos_cat_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 3
+      },
+      {
         "name": "tos_cat",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "pos_cat_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 2
+      },
+      {
+        "name": "pos_cat",
         "type": "string",
         "originalType": "CHAR",
         "maxLength": 255
