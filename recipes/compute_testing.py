@@ -537,3 +537,7 @@ for _,row in to_load.iterrows():
 end_time = datetime.now()
 seconds = (end_time-start_time).seconds
 print(f'Load process ended at {end_time} taking {seconds//3600} hours, {seconds//60%60} minutes, and {seconds%60} seconds')
+
+# Collect summary statistics to improve future query performance
+statistics_query = f'COLLECT SUMMARY STATISTICS ON {output_table_name}'
+e.query_to_df(query=statistics_query)
