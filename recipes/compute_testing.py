@@ -206,8 +206,8 @@ for _,row in to_load.iterrows():
             INSERT INTO {output_table_name}
     WITH all_claims_with_rd AS (
         SELECT
-        	b.*
-        	, tos_cat_desc.CODE_TXT as tos_cat
+            b.*
+            , tos_cat_desc.CODE_TXT as tos_cat
             , pos_cat_desc.CODE_TXT as pos_cat
             , CASE
                 WHEN claim_type = 'institutional_outpatient_visit' THEN
@@ -311,16 +311,16 @@ for _,row in to_load.iterrows():
                             , adm.net_elig_rd_amt
                             , ipn.net_elig_rd_amt) as net_elig_rd_amt_psi
                     , COALESCE(sum(vi.net_pd_rd_amt) OVER (PARTITION BY clm_li.dw_clm_key, clm_li.li_num)
-		                    , adm.net_pd_rd_amt
-		                    , ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
+                            , adm.net_pd_rd_amt
+                            , ipn.net_pd_rd_amt) as net_pd_rd_amt_psi
                     , clm_li.billd_amt
                     , clm_li.prov_alwd_amt
                     , clm_li.net_elig_amt
                     , CASE 
-                    	WHEN vi.dw_visit_key is not NULL THEN 'Outpatient'
-                    	WHEN adm.dw_adm_key is not NULL OR ipn_cat.dw_clm_key is not NULL THEN 'Inpatient'
-                    	WHEN proc.dw_clm_key is not NULL THEN 'Professional'
-                    	ELSE 'Not in DSL'
+                        WHEN vi.dw_visit_key is not NULL THEN 'Outpatient'
+                        WHEN adm.dw_adm_key is not NULL OR ipn_cat.dw_clm_key is not NULL THEN 'Inpatient'
+                        WHEN proc.dw_clm_key is not NULL THEN 'Professional'
+                        ELSE 'Not in DSL'
                     END as "DSL_CLM_TYP"
                     , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
                     , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
@@ -337,32 +337,32 @@ for _,row in to_load.iterrows():
                     and clm_li.rvnu_cd = vi.rvnu_cd
                     and vi.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit_cat vi_cat ON
-                	vi_cat.dw_visit_key = vi.dw_visit_key
-                	
+                    vi_cat.dw_visit_key = vi.dw_visit_key
+
                 -- Institutional Inpatient Admissions	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
                     adm.dw_clm_key = ck.dw_clm_key
                     and adm.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm_cat adm_cat ON
-                	adm_cat.dw_adm_key = adm.dw_adm_key   
-	            	
+                    adm_cat.dw_adm_key = adm.dw_adm_key   
+
                 -- Institutional Inpatient Non-Admission Claims	
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
                     ipn.dw_clm_key = ck.dw_clm_key
                     and ipn.li_num = clm_li.li_num
                     and ipn.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_cat ipn_cat ON
-                	ipn_cat.dw_clm_key = ipn.dw_clm_key 
-	            	
+                    ipn_cat.dw_clm_key = ipn.dw_clm_key 
+
                 -- Professional Claims
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_clm_li proc ON
                     proc.dw_clm_key = ck.dw_clm_key
                     and proc.li_num = clm_li.li_num
                     and proc.pd_thru_dt = DATE '9999-12-31'	
-				LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_cat proc_cat ON
-					proc_cat.dw_clm_key = proc.dw_clm_key
-					and proc_cat.li_num = proc.li_num 
-	            	
+                LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_cat proc_cat ON
+                    proc_cat.dw_clm_key = proc.dw_clm_key
+                    and proc_cat.li_num = proc.li_num 
+
                 WHERE
                     ck.disp_cd = 'A'
                     AND clm_li.disp_cd = 'A'
@@ -371,17 +371,17 @@ for _,row in to_load.iterrows():
                     AND ck.source_schema_cd = 'IL'
                     AND ck.home_host_local_ind in ('HOME', 'LOCAL')
                     AND prov.prov_fincl_id = '{pfin}'     
-		    ) a
-		) b
+            ) a
+        ) b
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table tos_cat_desc ON
-        	b.tos_cat_cd = tos_cat_desc.CODE_CD
-        	AND b.DSL_CLM_TYP = tos_cat_desc.CODE_CLM_TYP
-        	AND tos_cat_desc.COLUMN_NAME = 'tos_cat'
-        	   
+            b.tos_cat_cd = tos_cat_desc.CODE_CD
+            AND b.DSL_CLM_TYP = tos_cat_desc.CODE_CLM_TYP
+            AND tos_cat_desc.COLUMN_NAME = 'tos_cat'
+
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table pos_cat_desc ON
-        	b.pos_cat_cd = pos_cat_desc.CODE_CD
-        	AND b.DSL_CLM_TYP = pos_cat_desc.CODE_CLM_TYP
-        	AND pos_cat_desc.COLUMN_NAME = 'pos_cat'
+            b.pos_cat_cd = pos_cat_desc.CODE_CD
+            AND b.DSL_CLM_TYP = pos_cat_desc.CODE_CLM_TYP
+            AND pos_cat_desc.COLUMN_NAME = 'pos_cat'
     )
     , mbr_info AS (
         SELECT
