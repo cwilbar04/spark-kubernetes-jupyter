@@ -407,7 +407,7 @@ for _,row in to_load.iterrows():
     SELECT
         code_cd
         ,column_name
-        ,code_txt
+        ,code_txt as code_txt
         ,eff_date
         ,exp_date
     FROM ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE
@@ -425,8 +425,8 @@ for _,row in to_load.iterrows():
                 WHEN LENGTH(acrd.prov_fincl_id) > 10 THEN RIGHT(acrd.prov_fincl_id, 10)
                 ELSE acrd.prov_fincl_id
             END as "bill_pfin_10trimmed"
-            , acrd.prov_name as "provider_bill_pfin_name"
-            , acrd.provider_payee_name
+            , initcap(acrd.prov_name) as "provider_bill_pfin_name"
+            , initcap(acrd.provider_payee_name) as "provider_payee_name"
             , acrd.primy_prcg_prov_spclty_cd
 
     --- Member Info ---
