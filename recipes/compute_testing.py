@@ -458,7 +458,7 @@ for _,row in to_load.iterrows():
             , ccs2.CCS_desc as "CCSR Category Description"
             , clmdrg.drg_cd
             , clmdrg.maj_diag_cat_cd
-            , mdc.code_txt as "Major Diagnostic Category (MDC)"
+--            , mdc.code_txt as "Major Diagnostic Category (MDC)"
             , acrd.tos_cat_cd
             , acrd.tos_cat
             , acrd.pos_cat_cd
@@ -513,9 +513,10 @@ for _,row in to_load.iterrows():
             -- Currently just getting the DRG Code.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
                 and clmdrg.DRG_TYP_CD = 'H'
-            LEFT JOIN code_table mdc ON mdc.CODE_CD = clmdrg.MAJ_DIAG_CAT_CD
-                and mdc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
-                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE ;
+--            LEFT JOIN code_table mdc ON mdc.CODE_CD = clmdrg.MAJ_DIAG_CAT_CD
+--                and mdc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
+--                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE 
+                ;
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
