@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 14,
+    "versionNumber": 15,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631915980666
+    "lastModifiedOn": 1631916220856
   },
   "creationTag": {
     "versionNumber": 0,
@@ -310,7 +310,7 @@
       {
         "type": "records",
         "enabled": true,
-        "computeOnBuildMode": "NO",
+        "computeOnBuildMode": "PARTITION",
         "meta": {
           "name": "Record count",
           "level": 0
@@ -318,14 +318,58 @@
         "configuration": {}
       },
       {
-        "type": "partitioning",
+        "type": "col_stats",
         "enabled": true,
-        "computeOnBuildMode": "WHOLE_DATASET",
+        "computeOnBuildMode": "PARTITION",
         "meta": {
-          "name": "Partitioning statistics",
-          "level": 1
+          "name": "Columns statistics",
+          "level": 2
         },
-        "configuration": {}
+        "configuration": {
+          "aggregates": [
+            {
+              "column": "claim_line_key",
+              "aggregated": "COUNT_DISTINCT"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adv_col_stats",
+        "enabled": false,
+        "computeOnBuildMode": "NO",
+        "meta": {
+          "name": "Most frequent values",
+          "level": 3
+        },
+        "configuration": {
+          "aggregates": [],
+          "numberTopValues": 10
+        }
+      },
+      {
+        "type": "percentile_stats",
+        "enabled": false,
+        "computeOnBuildMode": "NO",
+        "meta": {
+          "name": "Columns percentiles",
+          "level": 4
+        },
+        "configuration": {
+          "aggregates": []
+        }
+      },
+      {
+        "type": "verify_col",
+        "enabled": false,
+        "computeOnBuildMode": "NO",
+        "meta": {
+          "name": "Data validity",
+          "level": 4
+        },
+        "configuration": {
+          "aggregates": []
+        }
       }
     ],
     "engineConfig": {
@@ -369,17 +413,29 @@
       "python": {}
     },
     "displayedState": {
+      "partition": "NP",
       "columns": [],
       "metrics": [
         "basic:COUNT_COLUMNS",
-        "records:COUNT_RECORDS"
+        "records:COUNT_RECORDS",
+        "col_stats:COUNT_DISTINCT:claim_line_key"
       ]
     }
   },
   "metricsChecks": {
     "runOnBuild": false,
-    "checks": [],
+    "checks": [
+      {
+        "values": [],
+        "type": "valueSet",
+        "meta": {
+          "name": "Value in set"
+        },
+        "computeOnBuildMode": "PARTITION"
+      }
+    ],
     "displayedState": {
+      "partition": "NP",
       "checks": []
     }
   },
