@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 13,
+    "versionNumber": 14,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631915897086
+    "lastModifiedOn": 1631915980666
   },
   "creationTag": {
     "versionNumber": 0,
@@ -228,7 +228,7 @@
         "maxLength": 2
       },
       {
-        "name": "Major Diagnostic Category _MDC_",
+        "name": "Major Diagnostic Category (MDC)",
         "type": "string",
         "originalType": "VARCHAR",
         "maxLength": 255
