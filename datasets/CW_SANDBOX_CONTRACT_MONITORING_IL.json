@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 12,
+    "versionNumber": 13,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631915541404
+    "lastModifiedOn": 1631915897086
   },
   "creationTag": {
     "versionNumber": 0,
@@ -51,7 +51,7 @@
     "notReadyIfEmpty": false,
     "mode": "table",
     "partitioningType": "custom",
-    "normalizeDoubles": true,
+    "normalizeDoubles": false,
     "table": "${PREFIX}CONTRACT_MONITORING${SUFFIX}",
     "schema": "${DATABASE}",
     "tableCreationMode": "auto",
