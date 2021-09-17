@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 19,
+    "versionNumber": 20,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631917440877
+    "lastModifiedOn": 1631917447443
   },
   "creationTag": {
     "versionNumber": 0,
@@ -440,7 +440,9 @@
     ],
     "displayedState": {
       "partition": "NP",
-      "checks": []
+      "checks": [
+        "Duplication Check"
+      ]
     }
   },
   "customFields": {}
