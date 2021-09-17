@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 16,
+    "versionNumber": 17,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631916559006
+    "lastModifiedOn": 1631916885384
   },
   "creationTag": {
     "versionNumber": 0,
@@ -426,7 +426,7 @@
     "runOnBuild": false,
     "checks": [
       {
-        "code": "# Define here a function that returns the outcome of the check.\ndef process(last_values, dataset, partition_id):\n    # last_values is a dict of the last values of the metrics,\n    # with the values as a dataiku.metrics.MetricDataPoint.\n    # dataset is a dataiku.Dataset object\n    result \u003d last_values[\u0027Record count\u0027] \u003d\u003d last_values[\u0027Distinct value count of claim_line_key\u0027]\n    if result:\n        return \u0027OK\u0027, \u0027No duplication\u0027\n    return \u0027ERROR\u0027, \u0027Duplication exists. Please check query for issues\u0027 # or \u0027WARNING\u0027 or \u0027ERROR\u0027\n",
+        "code": "# Define here a function that returns the outcome of the check.\ndef process(last_values, dataset, partition_id):\n    # last_values is a dict of the last values of the metrics,\n    # with the values as a dataiku.metrics.MetricDataPoint.\n    # dataset is a dataiku.Dataset object\n    result \u003d last_values[\u0027records:COUNT_RECORDS\u0027] \u003d\u003d last_values[\u0027col_stats:COUNT_DISTINCT:claim_line_key\u0027]\n    if result:\n        return \u0027OK\u0027, \u0027No duplication\u0027\n    return \u0027ERROR\u0027, \u0027Duplication exists. Check query.\u0027 # or \u0027WARNING\u0027 or \u0027ERROR\u0027\n",
         "envSelection": {
           "envMode": "INHERIT"
         },
