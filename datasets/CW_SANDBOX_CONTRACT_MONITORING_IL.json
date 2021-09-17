@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 11,
+    "versionNumber": 12,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631809532154
+    "lastModifiedOn": 1631915541404
   },
   "creationTag": {
     "versionNumber": 0,
@@ -74,6 +74,12 @@
         "type": "string",
         "originalType": "VARCHAR",
         "maxLength": 30
+      },
+      {
+        "name": "provider_bill_pfin_name",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 50
       },
       {
         "name": "provider_payee_name",
@@ -208,6 +214,24 @@
         "type": "string",
         "originalType": "CHAR",
         "maxLength": 3
+      },
+      {
+        "name": "DRG Description",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
+        "name": "maj_diag_cat_cd",
+        "type": "string",
+        "originalType": "CHAR",
+        "maxLength": 2
+      },
+      {
+        "name": "Major Diagnostic Category _MDC_",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
       },
       {
         "name": "tos_cat_cd",
