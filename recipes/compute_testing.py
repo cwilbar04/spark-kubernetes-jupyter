@@ -43,7 +43,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
          DEFAULT MERGEBLOCKRATIO
          (
             --- Provider Info ---
-            bill_pfin VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
+            bill_pfin VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC COMPRESS(,
             bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
             provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
             provider_payee_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
@@ -75,6 +75,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
             "DRG Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
+            BASE_DRG_DESCRIPTION VARCHAR(255) CHARACTER SET LATION NOT CASESPECIFIC,
             maj_diag_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
             "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
             tos_cat_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
