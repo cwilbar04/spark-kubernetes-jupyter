@@ -43,54 +43,169 @@ if recipe_vars['drop_and_recreate_table'] is True:
          DEFAULT MERGEBLOCKRATIO
          (
             --- Provider Info ---
-            bill_pfin VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC COMPRESS(,
-            bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN NOT CASESPECIFIC,
-            provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
-            provider_payee_name VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
-            primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
+            bill_pfin VARCHAR(30) CHARACTER SET LATIN COMPRESS {*recipe_vars["prov_finc_id_list_all"],}
+            , bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN COMPRESS {*[z[-10:] for z in recipe_vars["prov_finc_id_list_all"]],}
+            , provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN
+            , provider_payee_name VARCHAR(50) CHARACTER SET LATIN
+            , primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL) --more than 255 distinct values
 
             --- Member Info ---
-            dw_mbr_key DECIMAL(18,0),
-            gndr_cd CHAR(1) CHARACTER SET LATIN NOT CASESPECIFIC,
-            --age INTEGER, -- commented out for now as not needed. consider age grouping if needed in future
-            mbr_zip VARCHAR(12) CHARACTER SET LATIN NOT CASESPECIFIC,
-            mbr_city VARCHAR(28) CHARACTER SET LATIN NOT CASESPECIFIC,
-            ACCT_NAME VARCHAR(50) CHARACTER SET LATIN NOT CASESPECIFIC,
+            , dw_mbr_key DECIMAL(18,0) COMPRESS(NULL)
+            , gndr_cd CHAR(1) CHARACTER SET LATIN COMPRESS (' ', '!', '0', '9', '?', 'F', 'M', 'N', 'U', '^')
+            --,age INTEGER -- commented out for now as not needed. consider age grouping if needed in future
+            , mbr_zip VARCHAR(12) CHARACTER SET LATIN COMPRESS(NULL)
+            , mbr_city VARCHAR(28) CHARACTER SET LATIN COMPRESS(NULL)
+            , ACCT_NAME VARCHAR(50) CHARACTER SET LATIN COMPRESS(NULL)
 
             --- Claim Info ---
-            dw_clm_cntrl_key DECIMAL(18,0),
-            claim_line_key VARCHAR(41) CHARACTER SET LATIN NOT CASESPECIFIC,
-            dw_clm_key DECIMAL(18,0),
-            li_num DECIMAL(4,0),
-            incurd_dt DATE FORMAT 'YY/MM/DD',
-            incurd_month DATE FORMAT 'YY/MM/DD',
-            inpat_outpat_cd VARCHAR(1) CHARACTER SET LATIN NOT CASESPECIFIC,
-            hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN NOT CASESPECIFIC,
-            HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            rvnu_cd CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC,
-            RevCD_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            HCPC_OR_REV_DESC VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            prim_diag VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            DRG_CD CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
-            "DRG Description" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            BASE_DRG_DESCRIPTION VARCHAR(255) CHARACTER SET LATION NOT CASESPECIFIC,
-            maj_diag_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
-            "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            tos_cat_cd CHAR(3) CHARACTER SET LATIN NOT CASESPECIFIC,
-            tos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            pos_cat_cd CHAR(2) CHARACTER SET LATIN NOT CASESPECIFIC,
-            pos_cat CHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            --FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN NOT CASESPECIFIC, -- commented out for now. need to solve duplication issues before including if needed in future
-            --FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN NOT CASESPECIFIC,
-            billd_amt DECIMAL(11,2),
-            prov_alwd_amt DECIMAL(11,2),
-            net_elig_amt DECIMAL(15,2),
-            net_elig_rd_amt DECIMAL(15,2),
-            net_pd_rd_amt DECIMAL(15,2),
-            Net_Elig_or_RD_pd DECIMAL(15,2),
-            LOS INTEGER
+            , claim_type VARCHAR(35) CHARACTER SET LATIN
+                COMPRESS(
+                    'institutional_outpatient_visit'
+                    ,'institutional_inpatient_admission'
+                    ,'institutional_inpatient_other'
+                    ,'institutional_other'
+                    ,'professional'
+                    ,'other'
+                    )
+            , dw_clm_cntrl_key DECIMAL(18,0)
+            , claim_line_key VARCHAR(41) CHARACTER SET LATIN
+            , dw_clm_key DECIMAL(18,0)
+            , li_num DECIMAL(4,0)
+            , incurd_dt DATE FORMAT 'YY/MM/DD'
+            , incurd_month DATE FORMAT 'YY/MM/DD'
+            , inpat_outpat_cd VARCHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
+            , hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
+            , HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , rvnu_cd CHAR(4) CHARACTER SET LATIN COMPRESS(NULL)
+            , RevCD_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , HCPC_OR_REV_DESC VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , prim_diag VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , DRG_CD CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
+            , BASE_DRG_DESCRIPTION VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , "DRG Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , maj_diag_cat_cd CHAR(3) CHARACTER SET LATIN
+                COMPRESS ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
+                    , '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', 'PRE')
+            , "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN
+                COMPRESS (
+                    'ALCOHOL / SUBSTANCE ABUSE USE AND ALCOHOL / SUBSTANCE INDUCED ORGANIC MENTAL DISORDERS'
+                    , 'BURNS'
+                    , 'DISEASES AND DISORDERS OF THE BLOOD AND BLOOD FORMING ORGANS AND IMMUNOLOGICAL DISORDERS'
+                    , 'DISEASES AND DISORDERS OF THE CIRCULATORY SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE DIGESTIVE SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE EAR, NOSE, MOUTH AND THROAT'
+                    , 'DISEASES AND DISORDERS OF THE EYE'
+                    , 'DISEASES AND DISORDERS OF THE FEMALE REPRODUCTIVE SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE HEPATO-BILIARY SYSTEM AND PANCREAS'
+                    , 'DISEASES AND DISORDERS OF THE KIDNEY AND URINARY TRACT'
+                    , 'DISEASES AND DISORDERS OF THE MALE REPRODUCTIVE SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE MUSCULO-SKELETAL SYSTEM AND CONNECTIVE TISSUE'
+                    , 'DISEASES AND DISORDERS OF THE NERVOUS SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE RESPIRATORY SYSTEM'
+                    , 'DISEASES AND DISORDERS OF THE SKIN, SUBCUTANEOUS TISSUE, AND THE BREAST'
+                    , 'ENDOCRINE, NUTRITIONAL AND METABOLIC DISEASES AND DISORDERS'
+                    , 'FACTORS INFLUENCING HEALTH STATUS AND OTHER CONTACTS WITH HEALTH SERVICES'
+                    , 'HUMAN IMMUNODEFICIENCY VIRUS INFECTIONS'
+                    , 'INFECTIOUS AND PARASITIC DISEASES'
+                    , 'INJURY, POISONING AND TOXIC EFFECTS OF DRUGS'
+                    , 'MENTAL DISEASES AND DISORDERS'
+                    , 'MULTIPLE SIGNIFICANT TRAUMA'
+                    , 'MYELO-PROLIFERATIVE DISORDERS AND POORLY DIFFERENTIATED NEOPLASMS'
+                    , 'NEWBORNS, AND OTHER NEONATES WITH CONDITIONS ORIGINATING IN THE PERI- NATAL PERIOD.'
+                    , 'NO MDC AVAILABLE'
+                    , 'PRE-MDC'
+                    , 'PREGNANCY, CHILDBIRTH, AND THE PUERPERIUM'
+                )
+            , tos_cat_cd CHAR(2) CHARACTER SET LATIN
+                COMPRESS ('40', '50', '57', '60', '61', '63', '65', '70', '71', '72', '73', '74', '75', '76',
+                    '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91',
+                    '92', '93', '94', '95', '96', '97', '98', '99', 'BF', 'BN', 'GE')
+            , tos_cat CHAR(255) CHARACTER SET LATIN
+                COMPRESS (
+                    'All other imaging (Institutional)'
+                    --, 'Allergy'
+                    --, 'Anesthesia (professional)'
+                    , 'Blood Related Services (Institutional)'
+                    --, 'Brand Formulary Drugs'
+                    --, 'Brand Non-Formulary Drugs'
+                    --, 'Cardiac Cath'
+                    --, 'Cardiography'
+                    , 'Cardiovascular (Institutional)'
+                    --, 'Cardiovascular Other'
+                    --, 'Cardiovascular Therapeutic'
+                    , 'Cat-Scan - Imaging (Institutional)'
+                    --, 'Chemotherapy Administration'
+                    --, 'Chiropractic Manipulative'
+                    , 'Dialysis (Institutional)'
+                    --, 'Dialysis (professional)'
+                    --, 'Echocardiography'
+                    --, 'Evaluation & Management - Emergency'
+                    --, 'Evaluation & Management - Non-Emergency'
+                    --, 'Gastroenterology (professional)'
+                    --, 'Generic Drugs'
+                    --, 'High Units Services (Professional)'
+                    --, 'Home Health'
+                    --, 'Imaging (professional)'
+                    , 'Laboratory'
+                    --, 'Maternity Care & Delivery (professional)'
+                    , 'Maternity'
+                    , 'MRI - Imaging (Institutional)'
+                    --, 'Neurology'
+                    --, 'Non-Invasive Vascular'
+                    , 'Observation Room'
+                    --, 'Ophthalmology (professional)'
+                    --, 'Other Medical Expenses'
+                    , 'Other'
+                    --, 'Otorhinolaryngology'
+                    , 'Pharmacy (Institutional)'
+                    --, 'Physical Medicine & Rehab'
+                    , 'PT/OT/ST (Institutional)'
+                    --, 'Pulmonary'
+                    , 'Surgery'
+                    --, 'Therapeutic Injections (professional)'
+                    --, 'Venipuncture (Lab setting)'
+                )
+                -- commented out those that don't exist in institutional claims
+                -- need further analysis to most popular if expand to professional claims
+                -- full list is too many characters
+            , pos_cat_cd CHAR(2) CHARACTER SET LATIN
+                COMPRESS ('AB', 'AH', 'AS', 'CD', 'ER', 'HO', 'HV', 'IP', 'MH', 'MO', 'NE', 'NP'
+                , 'NR', 'NS', 'NT', 'OP', 'OT', 'OV', 'RH', 'RT')
+            , pos_cat CHAR(255) CHARACTER SET LATIN
+                COMPRESS (
+                    'Acute Hospital'
+                    , 'Ambulance'
+                    , 'Ambulatory Surgical Center (ASC)'
+                    , 'Chemical Dependency'
+                    , 'Emergency Room Visit'
+                    , 'Home Visit'
+                    , 'Hospice  (Non-Acute)'
+                    , 'Hospital Transitional Care
+                    , Swing Bed (Non-Acute)'
+                    , 'Hospital'
+                    , 'Inpatient Rehabilitation Facilities (Non-Acute)'
+                    , 'Inpatient Visit'
+                    , 'Mail Order'
+                    , 'Mental Health'
+                    , 'Office Visit'
+                    , 'Other'
+                    , 'Outpatient Rehab Visit'
+                    , 'Outpatient Visit'
+                    , 'Respite Care (Non-Acute)'
+                    , 'Retail'
+                    , 'Skilled Nursing Facility  (Non-Acute)'
+                )
+            --, FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
+            --, FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN
+            , billd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
+            , prov_alwd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
+            , net_elig_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , net_elig_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , net_pd_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , Net_Elig_or_RD_pd DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , LOS INTEGER COMPRESS (0,1,2,3,4,5,6,7) --compress most likely values
     )
     PRIMARY INDEX ( dw_clm_key ,li_num )
     '''
@@ -318,7 +433,7 @@ for _,row in to_load.iterrows():
                     , clm_li.billd_amt
                     , clm_li.prov_alwd_amt
                     , clm_li.net_elig_amt
-                    , CASE 
+                    , CASE
                         WHEN vi.dw_visit_key is not NULL THEN 'Outpatient'
                         WHEN adm.dw_adm_key is not NULL OR ipn_cat.dw_clm_key is not NULL THEN 'Inpatient'
                         WHEN proc.dw_clm_key is not NULL THEN 'Professional'
@@ -341,29 +456,29 @@ for _,row in to_load.iterrows():
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_visit_cat vi_cat ON
                     vi_cat.dw_visit_key = vi.dw_visit_key
 
-                -- Institutional Inpatient Admissions	
+                -- Institutional Inpatient Admissions
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm adm ON
                     adm.dw_clm_key = ck.dw_clm_key
                     and adm.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_adm_cat adm_cat ON
-                    adm_cat.dw_adm_key = adm.dw_adm_key   
+                    adm_cat.dw_adm_key = adm.dw_adm_key
 
-                -- Institutional Inpatient Non-Admission Claims	
+                -- Institutional Inpatient Non-Admission Claims
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_clm_li ipn ON
                     ipn.dw_clm_key = ck.dw_clm_key
                     and ipn.li_num = clm_li.li_num
                     and ipn.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_ipn_cat ipn_cat ON
-                    ipn_cat.dw_clm_key = ipn.dw_clm_key 
+                    ipn_cat.dw_clm_key = ipn.dw_clm_key
 
                 -- Professional Claims
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_clm_li proc ON
                     proc.dw_clm_key = ck.dw_clm_key
                     and proc.li_num = clm_li.li_num
-                    and proc.pd_thru_dt = DATE '9999-12-31'	
+                    and proc.pd_thru_dt = DATE '9999-12-31'
                 LEFT JOIN ENTPR_BP_ADS_PSI_VIEWS.il_proc_cat proc_cat ON
                     proc_cat.dw_clm_key = proc.dw_clm_key
-                    and proc_cat.li_num = proc.li_num 
+                    and proc_cat.li_num = proc.li_num
 
                 WHERE
                     ck.disp_cd = 'A'
@@ -372,7 +487,7 @@ for _,row in to_load.iterrows():
                     AND ck.incurd_dt < '{datetime.strftime(end_date,"%Y-%m-%d")}'
                     AND ck.source_schema_cd = 'IL'
                     AND ck.home_host_local_ind in ('HOME', 'LOCAL')
-                    AND prov.prov_fincl_id = '{pfin}'     
+                    AND prov.prov_fincl_id = '{pfin}'
             ) a
         ) b
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table tos_cat_desc ON
@@ -420,7 +535,7 @@ for _,row in to_load.iterrows():
         'RVNU_CD')
    ), drg_codes AS (
    SELECT
-        DISTINCT	
+        DISTINCT
         CASE
             WHEN "MDC_CD" = 'PRE' THEN 'PRE-MDC'
             ELSE COALESCE(mdc_desc.CODE_TXT,'NO MDC AVAILABLE')
@@ -428,21 +543,14 @@ for _,row in to_load.iterrows():
         , a.MDC_CD
         , a."DRG_CD"
         , a."DRG Description"
-    --	, CASE 
-    --		WHEN INSTR(a."DRG Description",' WITH ') > 0 THEN LEFT(a."DRG Description", 10 --INSTR(a."DRG Description",' WITH ')
-    --		) 
-    --		--WHEN INSTR(a."DRG Description",' WITHOUT ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' WITHOUT ')) 
-    --		--WHEN INSTR(a."DRG Description",' W ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' W ')) 
-    --	--	WHEN INSTR(a."DRG Description",' W/O ') > 0 THEN LEFT(a."DRG Description", INSTR(a."DRG Description",' W/O ')) 
-    --		ELSE a."DRG Description"
-    --	END as "Base DRG Description" 
+        , COALESCE(REGEXP_SUBSTR(a."DRG Description",'^.*(?= W\/?\w* {1}(M?CC(\/MCC)?).*)'),a."DRG Description") as "BASE_DRG_DESCRIPTION"
     FROM
         (
-        SELECT 
+        SELECT
                 MAJ_DIAG_CAT_CD,
                 dcd.MDC as "CMS_MDC_VERSION",
                 dcd_most_recent.MDC as "CMS_MDC_MOST_RECENT_VERSION",
-                CASE 
+                CASE
                     WHEN dcd_most_recent.MS_DRG_TITLE is NULL THEN dcd.MDC
                     ELSE dcd_most_recent.MDC
                 END as "MDC_CD",
@@ -450,11 +558,11 @@ for _,row in to_load.iterrows():
                 DRG_GRPR_VRSN_NUM,
                 dcd.MS_DRG_TITLE as "CMS_VERSION_DRG_DESCRIPTION",
                 dcd_most_recent.MS_DRG_TITLE as "CMS_MOST_RECENT_VERSION_DRG_DESCRIPTION",
-                COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"	
+                COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"
             FROM ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
             LEFT JOIN PANDA.DRG_CMS_DATA dcd
                 ON clmdrg.DRG_CD = RIGHT(concat('000',dcd.MS_DRG_SPEC_GRP), 3)
-                AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN 
+                AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
                 AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
             LEFT JOIN PANDA.DRG_CMS_DATA dcd_most_recent
                 ON clmdrg.DRG_CD = RIGHT(concat('000',dcd_most_recent.MS_DRG_SPEC_GRP), 3)
@@ -465,7 +573,7 @@ for _,row in to_load.iterrows():
             GROUP BY 1,2,3,4,5,6,7,8,9
             ) a
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE mdc_desc ON mdc_desc.CODE_CD = a.MDC_CD
-            AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'  
+            AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
    )
 
         SELECT
@@ -489,6 +597,7 @@ for _,row in to_load.iterrows():
             , acct.acct_name
 
      --- Claim Info ---
+            , acrd.claim_type
             , acrd.dw_clm_cntrl_key
             , concat(to_char(acrd.dw_clm_key),'-',to_char(acrd.Li_num)) as "claim_line_key"
             , acrd.dw_clm_key
@@ -508,6 +617,7 @@ for _,row in to_load.iterrows():
             , ccs2.diag_desc as "ICD-10-CM Codes Description"
             , ccs2.CCS_desc as "CCSR Category Description"
             , clmdrg.drg_cd
+            , drg_codes.BASE_DRG_DESCRIPTION
             , drg_codes."DRG Description"
             , clmdrg.maj_diag_cat_cd
             , drg_codes."MDC Description" as "Major Diagnostic Category (MDC)"
