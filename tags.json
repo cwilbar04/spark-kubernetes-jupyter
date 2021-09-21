@@ -1,5 +1,8 @@
 {
   "tags": {
+    "duplicated": {
+      "color": "#3A85AD"
+    },
     "Teradata_PROD_NPID": {
       "color": "#1ac2ab"
     },

@@ -8,7 +8,7 @@
     "columnWidthsByName": {
       "bill_pfin": 113,
       "bill_pfin_10trimmed": 158,
-      "provider_payee_name": 225,
+      "provider_payee_name": 266,
       "primy_prcg_prov_spclty_cd": 203,
       "dw_mbr_key": 155,
       "gndr_cd": 100,
@@ -39,7 +39,14 @@
       "dw_clm_cntrl_key": 162,
       "inpat_outpat_cd": 128,
       "tos_cat": 300,
-      "Net_Elig_or_RD_pd": 143
+      "Net_Elig_or_RD_pd": 143,
+      "provider_bill_pfin_name": 246,
+      "DRG Description": 300,
+      "maj_diag_cat_cd": 128,
+      "Major Diagnostic Category (MDC)": 300,
+      "tos_cat_cd": 100,
+      "pos_cat_cd": 100,
+      "pos_cat": 300
     },
     "coloring": {
       "scheme": "MEANING_AND_STATUS",
