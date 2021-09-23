@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 0,
+    "versionNumber": 1,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632435316282
+    "lastModifiedOn": 1632435541326
   },
   "creationTag": {
     "versionNumber": 0,
@@ -59,8 +59,33 @@
     "readSQLDateColsAsDSSDates": true
   },
   "schema": {
-    "columns": [],
-    "userModified": true
+    "columns": [
+      {
+        "name": "IP_OP",
+        "type": "string",
+        "maxLength": 500
+      },
+      {
+        "name": "Modeling_Team_Category",
+        "type": "string",
+        "maxLength": 500
+      },
+      {
+        "name": "Code",
+        "type": "string",
+        "maxLength": 500
+      },
+      {
+        "name": "Code_Type",
+        "type": "string",
+        "maxLength": 500
+      },
+      {
+        "name": "load_date",
+        "type": "date"
+      }
+    ],
+    "userModified": false
   },
   "metrics": {
     "probes": [
