@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 1,
+    "versionNumber": 2,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632435541326
+    "lastModifiedOn": 1632435717501
   },
   "creationTag": {
     "versionNumber": 0,
@@ -43,6 +43,7 @@
   },
   "tags": [],
   "params": {
+    "assumedDbTzForUnknownTz": "GMT",
     "primaryIndexBehavior": "AUTO",
     "primaryIndexIsUnique": false,
     "primaryIndexColumns": [],
@@ -50,13 +51,15 @@
     "notReadyIfEmpty": false,
     "mode": "table",
     "partitioningType": "custom",
-    "normalizeDoubles": true,
-    "table": "${projectKey}_modeling_team_categories",
+    "normalizeDoubles": false,
+    "table": "CONTRACT_MONITROING_MODELING_TEAM_CATEGORIES",
+    "schema": "${DATABASE}",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
     "writeJDBCBadDataBehavior": "DISCARD_ROW",
     "readColsWithUnknownTzAsDates": false,
-    "readSQLDateColsAsDSSDates": true
+    "readSQLDateColsAsDSSDates": true,
+    "assumedTzForUnknownTz": "GMT"
   },
   "schema": {
     "columns": [
@@ -85,7 +88,7 @@
         "type": "date"
       }
     ],
-    "userModified": false
+    "userModified": true
   },
   "metrics": {
     "probes": [
