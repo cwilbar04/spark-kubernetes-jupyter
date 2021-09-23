@@ -16,7 +16,16 @@
   },
   "redispatchPartitioning": false,
   "maxRunningActivities": 0,
-  "inputs": {},
+  "inputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "Contract_Category_Table_20210923",
+          "deps": []
+        }
+      ]
+    }
+  },
   "outputs": {
     "main": {
       "items": [
@@ -28,11 +37,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 71,
+    "versionNumber": 72,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632412700749
+    "lastModifiedOn": 1632434487471
   },
   "creationTag": {
     "versionNumber": 0,
