@@ -18,7 +18,12 @@
   "maxRunningActivities": 0,
   "inputs": {
     "main": {
-      "items": []
+      "items": [
+        {
+          "ref": "Modeling_Team_Categories",
+          "deps": []
+        }
+      ]
     }
   },
   "outputs": {
@@ -32,11 +37,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 74,
+    "versionNumber": 75,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632434688376
+    "lastModifiedOn": 1632435806056
   },
   "creationTag": {
     "versionNumber": 0,
