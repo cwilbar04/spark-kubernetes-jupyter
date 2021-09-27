@@ -308,6 +308,10 @@ for _,row in missing_data.iterrows():
 #to_load
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+## Need to define regex string outside of "f-string" for query to render the backslashes
+## Use doubles backslash to print an actual backslash
+base_drg_regex = "'^.*(?= W\\/?\\w* {1}(M?CC(\\/MCC)?).*)'"
+
 to_load['bill_pfin'] = to_load['bill_pfin'].astype(str).str.zfill(13)
 start_time = datetime.now()
 print(f'Load process started at {start_time}')
@@ -543,7 +547,7 @@ for _,row in to_load.iterrows():
         , a.MDC_CD
         , a."DRG_CD"
         , a."DRG Description"
-        , COALESCE(REGEXP_SUBSTR(a."DRG Description",'^.*(?= W\\/?\\w* {1}(M?CC(\\/MCC)?).*)'),a."DRG Description") as "BASE_DRG_DESCRIPTION"
+        , COALESCE(REGEXP_SUBSTR(a."DRG Description",{base_drg_regex}),a."DRG Description") as "BASE_DRG_DESCRIPTION"
     FROM
         (
         SELECT
@@ -569,7 +573,6 @@ for _,row in to_load.iterrows():
                 AND dcd_most_recent.CMS_DRG_VRSN = 38
                 AND dcd_most_recent.CMS_DRG_TYP = 'CN'
             WHERE clmdrg.DRG_TYP_CD = 'H' and clmdrg.DRG_GRPR_VRSN_NUM > 34
-            --and EXISTS (SELECT 1 FROM "RADAR"."RADAR_CONTRACT_MONITORING_IL" a WHERE a.dw_clm_key = clmdrg.DW_CLM_KEY)
             GROUP BY 1,2,3,4,5,6,7,8,9
             ) a
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE mdc_desc ON mdc_desc.CODE_CD = a.MDC_CD
