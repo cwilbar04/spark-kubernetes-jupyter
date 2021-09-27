@@ -543,7 +543,7 @@ for _,row in to_load.iterrows():
         , a.MDC_CD
         , a."DRG_CD"
         , a."DRG Description"
-        , COALESCE(REGEXP_SUBSTR(a."DRG Description",'^.*(?= W\/?\w* {1}(M?CC(\/MCC)?).*)'),a."DRG Description") as "BASE_DRG_DESCRIPTION"
+        , COALESCE(REGEXP_SUBSTR(a."DRG Description",'^.*(?= W\\/?\\w* {1}(M?CC(\\/MCC)?).*)'),a."DRG Description") as "BASE_DRG_DESCRIPTION"
     FROM
         (
         SELECT
