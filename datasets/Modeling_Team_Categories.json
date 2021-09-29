@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 4,
+    "versionNumber": 5,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632435768901
+    "lastModifiedOn": 1632927506286
   },
   "creationTag": {
     "versionNumber": 0,
@@ -52,7 +52,7 @@
     "mode": "table",
     "partitioningType": "custom",
     "normalizeDoubles": false,
-    "table": "CONTRACT_MONITROING_MODELING_TEAM_CATEGORIES",
+    "table": "CONTRACT_MONITORING_MODELING_TEAM_CATEGORIES",
     "schema": "${DATABASE}",
     "tableCreationMode": "auto",
     "writeInsertBatchSize": 10000,
