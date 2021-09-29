@@ -92,17 +92,122 @@
   "charts": [
     {
       "copySelectionFromScript": true,
-      "engineType": "LINO",
+      "engineType": "SQL",
+      "refreshableSelection": {
+        "selection": {
+          "useMemTable": false,
+          "filter": {
+            "distinct": false,
+            "enabled": false
+          },
+          "partitionSelectionMethod": "ALL",
+          "latestPartitionsN": 1,
+          "ordering": {
+            "enabled": false,
+            "rules": []
+          },
+          "samplingMethod": "FULL",
+          "maxRecords": -1,
+          "targetRatio": 0.02,
+          "withinFirstN": -1,
+          "maxReadUncompressedBytes": -1
+        },
+        "autoRefreshSample": false,
+        "_refreshTrigger": 0
+      },
       "def": {
-        "type": "grouped_columns",
-        "variant": "normal",
-        "name": "New chart",
+        "type": "stacked_bars",
+        "variant": "stacked_100",
+        "name": "Count by provider_bill_pfin_name and pos_cat",
         "userEditedName": false,
-        "genericDimension0": [],
-        "genericDimension1": [],
+        "genericDimension0": [
+          {
+            "column": "provider_bill_pfin_name",
+            "type": "ALPHANUM",
+            "numParams": {
+              "emptyBinsMode": "ZEROS"
+            },
+            "maxValues": 20,
+            "generateOthersCategory": true,
+            "oneTickPerBin": false,
+            "filters": [],
+            "isA": "dimension",
+            "possibleSorts": [
+              {
+                "type": "NATURAL",
+                "label": "Natural ordering",
+                "sortAscending": true
+              },
+              {
+                "type": "AGGREGATION",
+                "measureIdx": 0,
+                "label": "Count of records, descending"
+              },
+              {
+                "type": "AGGREGATION",
+                "measureIdx": 0,
+                "label": "Count of records, ascending",
+                "sortAscending": true
+              }
+            ],
+            "sort": {
+              "type": "NATURAL",
+              "label": "Natural ordering",
+              "sortAscending": true
+            }
+          }
+        ],
+        "genericDimension1": [
+          {
+            "column": "pos_cat",
+            "type": "ALPHANUM",
+            "numParams": {
+              "emptyBinsMode": "ZEROS"
+            },
+            "maxValues": 20,
+            "generateOthersCategory": true,
+            "oneTickPerBin": false,
+            "filters": [],
+            "isA": "dimension",
+            "possibleSorts": [
+              {
+                "type": "NATURAL",
+                "label": "Natural ordering",
+                "sortAscending": true
+              },
+              {
+                "type": "AGGREGATION",
+                "measureIdx": 0,
+                "label": "Count of records, descending"
+              },
+              {
+                "type": "AGGREGATION",
+                "measureIdx": 0,
+                "label": "Count of records, ascending",
+                "sortAscending": true
+              }
+            ],
+            "sort": {
+              "type": "AGGREGATION",
+              "measureIdx": 0,
+              "label": "Count of records, descending"
+            }
+          }
+        ],
         "facetDimension": [],
         "animationDimension": [],
-        "genericMeasures": [],
+        "genericMeasures": [
+          {
+            "function": "COUNT",
+            "type": "NUMERICAL",
+            "displayed": true,
+            "isA": "measure",
+            "displayAxis": "axis1",
+            "displayType": "column",
+            "computeMode": "NORMAL",
+            "computeModeDim": 0
+          }
+        ],
         "xDimension": [],
         "yDimension": [],
         "uaXDimension": [],
@@ -120,13 +225,14 @@
         "tooltipMeasures": [],
         "boxplotBreakdownDim": [],
         "boxplotValue": [],
+        "filters": [],
         "axis1LogScale": false,
         "axis2LogScale": false,
         "includeZero": true,
         "smoothing": true,
         "showLegend": true,
         "showXAxis": false,
-        "showInChartValues": false,
+        "showInChartValues": true,
         "showInChartLabels": true,
         "strokeWidth": 1,
         "fillOpacity": 0.6,
@@ -179,9 +285,10 @@
           "gridLonDeg": 0.6,
           "gridLatDeg": 0.6
         },
+        "thumbnailData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAYAAACiu5n/AAAAAXNSR0IArs4c6QAAAllJREFUaENjZBhhgJFU/8qXb9lPqh5qqO8PMMFpTOAOVUw5fukXDLoBEjAJ3adbGLJt4nNHPUwoNgYihvHFLsi9WGPYJhvDK9fzNhYPiRgeNh4m5BFYFGGNQeT4wxKb6NELysOrOv8O3himKDBwBMAsVaFRDxMqsxjoUWgRE7t4kzmWGAYl6VyHODJiuGxzF8FQoVBBb5AZQROCt6ngVmOLWULrPtnCkOsYt2LQl9LExDa6zzFiHxrjgyoPZ1qp3VMT41MiGLVQBeQk6UFVSo84D2OLWWKTM0ZsW6Z+ZGBm40c3c5qKUCHJeVixaqM4scmOUnUT/CyIMsJvE1pOME9kZuDm+4uueTIP23eSPUyPagnZocTE8pBuSxPjQVzRjrMgg5bSS+cqtAy6GB5xHsYVe9QIiNWX63pIjmGiSpFBrIhkD9O70MIXduixjpKHsbSnJx9yqBtyHiYlacMDAOr5OcrC+aMeJpT9BipJE4pZrFWSddZPBkZGdpifpq52Jb17qFC2OYBQoNBSvicYtesYvBnaTbTNxGut3rPtDMs6ft0b8kkaPZ/i8vWgH9MilEpwJXF8ATD1qnHvkIthWEAMSw8T9BTI90QM0YKUgZL05Z8ZpBda8uWbtxFKbuTK9wcQHstCmP2fM3Cn6ncMu6wwx7NAanSeb2a48iOzZlAlaUJVD8GxKzwxTkEMD8zsIbpnCQUOtmbm5dwNeYMqhknJCsPaw5wsLD/afAw4CAUIruFZmL5rmZtyhkwMkzwhji0/35EvGvUwoWQz1OVJjuFRDw+xEBhxMQwAwnMKOc6LJIAAAAAASUVORK5CYII\u003d",
         "disableSafetyLimits": false,
         "useLiveProcessingIfAvailable": true,
-        "legendPlacement": "OUTER_RIGHT"
+        "legendPlacement": "OUTER_TOP"
       },
       "maxDataBytes": 157286400
     }
