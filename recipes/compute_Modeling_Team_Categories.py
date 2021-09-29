@@ -8,6 +8,10 @@ from datetime import datetime
 category_ds = dataiku.Dataset("Contract_Category_Table_20210923")
 category_df = category_ds.get_dataframe()
 
+# Rev Code needs to be 4 digits with leading zeros
+category_df.loc[category_df['Code_Type'] == 'REV','Code'] =\
+    category_df.loc[category_df['Code_Type'] == 'REV','Code'].apply(lambda x: x.zfill(4))
+
 # Compute recipe outputs from inputs
 
 category_df['load_date'] = datetime.now()
