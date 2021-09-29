@@ -564,12 +564,12 @@ for _,row in to_load.iterrows():
                 dcd_most_recent.MS_DRG_TITLE as "CMS_MOST_RECENT_VERSION_DRG_DESCRIPTION",
                 COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"
             FROM ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
-            LEFT JOIN PANDA.DRG_CMS_DATA dcd
-                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd.MS_DRG_SPEC_GRP), 3)
+            LEFT JOIN PANDA.CMS_DRG_DATA dcd
+                ON clmdrg.DRG_CD = dcd.MS_DRG_SPEC_GRP
                 AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
                 AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
-            LEFT JOIN PANDA.DRG_CMS_DATA dcd_most_recent
-                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd_most_recent.MS_DRG_SPEC_GRP), 3)
+            LEFT JOIN PANDA.CMS_DRG_DATA dcd_most_recent
+                ON clmdrg.DRG_CD = dcd_most_recent.MS_DRG_SPEC_GRP
                 AND dcd_most_recent.CMS_DRG_VRSN = 38
                 AND dcd_most_recent.CMS_DRG_TYP = 'CN'
             WHERE clmdrg.DRG_TYP_CD = 'H' and clmdrg.DRG_GRPR_VRSN_NUM > 34
@@ -675,7 +675,7 @@ for _,row in to_load.iterrows():
             -- Additional account info.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = acrd.dw_acct_key
                 and acct.now_ind = 'Y'
-            -- Currently just getting the DRG Code.
+            -- Get DRG from CLM_DRG table and use associated MDC
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
                 and clmdrg.DRG_TYP_CD = 'H'
             LEFT JOIN drg_codes ON clmdrg.DRG_CD = drg_codes.DRG_CD
