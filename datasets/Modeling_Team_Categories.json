@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 5,
+    "versionNumber": 6,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632927506286
+    "lastModifiedOn": 1632927532079
   },
   "creationTag": {
     "versionNumber": 0,
@@ -76,7 +76,6 @@
       {
         "name": "Code",
         "type": "string",
-        "meaning": "Text",
         "maxLength": 500
       },
       {
@@ -89,7 +88,7 @@
         "type": "date"
       }
     ],
-    "userModified": true
+    "userModified": false
   },
   "metrics": {
     "probes": [
