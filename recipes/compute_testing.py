@@ -328,8 +328,8 @@ for _,row in to_load.iterrows():
     WITH all_claims_with_rd AS (
         SELECT
             b.*
-            , tos_cat_desc.CODE_TXT as tos_cat
-            , pos_cat_desc.CODE_TXT as pos_cat
+            , TRIM(tos_cat_desc.CODE_TXT) as tos_cat
+            , TRIM(pos_cat_desc.CODE_TXT) as pos_cat
             , CASE
                 WHEN claim_type = 'institutional_outpatient_visit' THEN
                     sum(net_elig_proportion) OVER
