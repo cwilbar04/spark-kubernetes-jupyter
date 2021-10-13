@@ -5,7 +5,7 @@ from dataiku import pandasutils as pdu
 from datetime import datetime
 
 # Read recipe inputs
-category_ds = dataiku.Dataset("Contract_Category_Table_20210923")
+category_ds = dataiku.Dataset("Contract_Category_Table_Latest")
 category_df = category_ds.get_dataframe()
 
 # Rev Code needs to be 4 digits with leading zeros

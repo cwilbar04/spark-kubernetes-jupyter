@@ -20,7 +20,7 @@
     "main": {
       "items": [
         {
-          "ref": "Contract_Category_Table_20210923",
+          "ref": "Contract_Category_Table_Latest",
           "deps": []
         }
       ]
@@ -37,11 +37,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 6,
+    "versionNumber": 7,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632941589774
+    "lastModifiedOn": 1634138210066
   },
   "creationTag": {
     "versionNumber": 0,
