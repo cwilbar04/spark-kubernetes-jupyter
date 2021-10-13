@@ -55,7 +55,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             --,age INTEGER -- commented out for now as not needed. consider age grouping if needed in future
             , mbr_zip VARCHAR(12) CHARACTER SET LATIN COMPRESS(NULL)
             , mbr_city VARCHAR(28) CHARACTER SET LATIN COMPRESS(NULL)
-            , ACCT_NAME VARCHAR(50) CHARACTER SET LATIN COMPRESS(NULL)
+            , acct_name VARCHAR(50) CHARACTER SET LATIN COMPRESS(NULL)
 
             --- Claim Info ---
             , claim_type VARCHAR(35) CHARACTER SET LATIN
@@ -75,20 +75,20 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , incurd_month DATE FORMAT 'YY/MM/DD'
             , inpat_outpat_cd VARCHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
             , hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
-            , HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , hcpcs_cpt_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , rvnu_cd CHAR(4) CHARACTER SET LATIN COMPRESS(NULL)
-            , RevCD_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , HCPC_OR_REV_DESC VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , prim_diag VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , DRG_CD CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
-            , BASE_DRG_DESCRIPTION VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "DRG Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , rvnu_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , hcpcs_or_rvnu_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , primy_diag_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , icd_10_cm_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , ccsr_category_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
+            , base_drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , maj_diag_cat_cd CHAR(3) CHARACTER SET LATIN
                 COMPRESS ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
                     , '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', 'PRE')
-            , "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN
+            , maj_diag_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'ALCOHOL / SUBSTANCE ABUSE USE AND ALCOHOL / SUBSTANCE INDUCED ORGANIC MENTAL DISORDERS'
                     , 'BURNS'
@@ -122,7 +122,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                 COMPRESS ('40', '50', '57', '60', '61', '63', '65', '70', '71', '72', '73', '74', '75', '76',
                     '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91',
                     '92', '93', '94', '95', '96', '97', '98', '99', 'BF', 'BN', 'GE')
-            , tos_cat CHAR(255) CHARACTER SET LATIN
+            , tos_cat_desc CHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'All other imaging (Institutional)'
                     --, 'Allergy'
@@ -173,7 +173,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , pos_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('AB', 'AH', 'AS', 'CD', 'ER', 'HO', 'HV', 'IP', 'MH', 'MO', 'NE', 'NP'
                 , 'NR', 'NS', 'NT', 'OP', 'OT', 'OV', 'RH', 'RT')
-            , pos_cat CHAR(255) CHARACTER SET LATIN
+            , pos_cat_desc CHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'Acute Hospital'
                     , 'Ambulance'
@@ -197,15 +197,19 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     , 'Retail'
                     , 'Skilled Nursing Facility  (Non-Acute)'
                 )
-            --, FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
-            --, FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN
+            , er_cat_cd CHAR(2) CHARACTER SET LATIN
+                COMPRESS ('10', '20')
+            , er_cat_desc
+                COMPRESS ('ER', 'Non-ER')
+            --, fincl_arngmnt_cd CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
+            --, fincl_arngmnt_desc VARCHAR(255) CHARACTER SET LATIN
             , billd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
             , prov_alwd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
             , net_elig_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
             , net_elig_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
             , net_pd_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
-            , Net_Elig_or_RD_pd DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
-            , LOS INTEGER COMPRESS (0,1,2,3,4,5,6,7) --compress most likely values
+            , net_elig_or_rd_pd DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , los INTEGER COMPRESS (0,1,2,3,4,5,6,7) --compress most likely values
     )
     PRIMARY INDEX ( dw_clm_key ,li_num )
     '''
@@ -328,8 +332,9 @@ for _,row in to_load.iterrows():
     WITH all_claims_with_rd AS (
         SELECT
             b.*
-            , TRIM(tos_cat_desc.CODE_TXT) as tos_cat
-            , TRIM(pos_cat_desc.CODE_TXT) as pos_cat
+            , TRIM(tos_cat_desc.CODE_TXT) as tos_cat_desc
+            , TRIM(pos_cat_desc.CODE_TXT) as pos_cat_desc
+            , TRIM(er_cat_desc.CODE_TXT) as er_cat_desc
             , CASE
                 WHEN claim_type = 'institutional_outpatient_visit' THEN
                     sum(net_elig_proportion) OVER
@@ -421,7 +426,9 @@ for _,row in to_load.iterrows():
                                 WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
                                 ELSE 'other_institutional'
                             END
-                        WHEN clm_li.clm_filing_cd = '02' THEN 'professional'
+                        WHEN clm_li.clm_filing_cd = '02' THEN 
+                            CASE 
+                                WHEN 'professional'
                         ELSE 'other_not_01_or_02_why'
                     END as claim_type
                     -- Outpatient visits in DSL can be split in to multiple lines with the same values for all
@@ -445,6 +452,7 @@ for _,row in to_load.iterrows():
                     END as "DSL_CLM_TYP"
                     , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
                     , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
+                    , COALESCE (vi_cat.er_cat, adm_cat.er_cat, ipn_cat.er_cat, proc_cat.er_cat) as er_cat_cd
                 FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
                 INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
                     AND ck.source_schema_cd = clm_li.source_schema_cd
@@ -503,6 +511,11 @@ for _,row in to_load.iterrows():
             b.pos_cat_cd = pos_cat_desc.CODE_CD
             AND b.DSL_CLM_TYP = pos_cat_desc.CODE_CLM_TYP
             AND pos_cat_desc.COLUMN_NAME = 'pos_cat'
+            
+        LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table er_cat_desc ON
+            b.er_cat_cd = er_cat_desc.CODE_CD
+            AND b.DSL_CLM_TYP = er_cat_desc.CODE_CLM_TYP
+            AND er_cat_desc.COLUMN_NAME = 'er_cat'
     )
     , mbr_info AS (
         SELECT
@@ -609,26 +622,28 @@ for _,row in to_load.iterrows():
             , acrd.incurd_dt - EXTRACT(DAY from acrd.incurd_dt) + 1 as "incurd_month"
             , acrd.inpat_outpat_cd
             , acrd.HCPCS_CPT_Cd
-            , cpt_code.code_txt as "HCPCS_CPT_Code_Desc"
+            , cpt_code.code_txt as hcpcs_cpt_cd_desc
             , acrd.rvnu_cd
-            , rvcode.code_txt as "RevCD_Desc"
+            , rvcode.code_txt as rvnu_cd_desc
             , CASE
              WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
                 ELSE cpt_code.code_txt
-            END AS "HCPC_OR_REV_DESC"
-            , diag.code_txt as "prim_diag" -- from acrd.primy_diag_cd
-            , ccs2.diag_desc as "ICD-10-CM Codes Description"
-            , ccs2.CCS_desc as "CCSR Category Description"
+            END AS "hcpcs_or_rvnu_desc"
+            , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
+            , ccs2.diag_desc as icd_10_cm_desc
+            , ccs2.CCS_desc as ccsr_category_desc
             , clmdrg.drg_cd
             , drg_codes.BASE_DRG_DESCRIPTION
             , drg_codes."DRG Description"
             , clmdrg.maj_diag_cat_cd
-            , drg_codes."MDC Description" as "Major Diagnostic Category (MDC)"
+            , drg_codes."MDC Description" as maj_diag_cat_desc
             , acrd.tos_cat_cd
-            , acrd.tos_cat
+            , acrd.tos_cat_desc
             , acrd.pos_cat_cd
-            , acrd.pos_cat
-            --, plcy.FINCL_ARNGMT_CD -- commented out for now. need to solve duplication issues before including if needed in future
+            , acrd.pos_cat_desc
+            , acrd.er_cat_cd
+            , acrd.er_cat_desc
+            --, plcy.fincl_arngmt_cd -- commented out for now. need to solve duplication issues before including if needed in future
             --, plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
             , acrd.billd_amt
             , acrd.prov_alwd_amt
@@ -638,7 +653,7 @@ for _,row in to_load.iterrows():
             , CASE
                 WHEN acrd.net_elig_rd_amt IS NULL then acrd.net_elig_amt
                 ELSE acrd.net_pd_rd_amt
-            END as Net_Elig_or_RD_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
+            END as net_elig_or_rd_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
             ,acrd.Svc_To_Dt - acrd.Svc_From_Dt as LOS
         FROM
             --- Base RADAR tables ---
