@@ -703,7 +703,7 @@ for _,row in to_load.iterrows():
                 and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
             LEFT JOIN code_table mdc_desc ON mdc_desc.CODE_CD = drg_mdc.maj_diag_cat_cd
                 AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'    
-                and acrd.incurd_dt BETWEEN mdc_dec.EFF_DATE and mdc_desc.EXP_DATE
+                and acrd.incurd_dt BETWEEN mdc_desc.EFF_DATE and mdc_desc.EXP_DATE
                 ;
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
