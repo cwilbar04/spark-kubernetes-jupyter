@@ -37,11 +37,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 2,
+    "versionNumber": 3,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632434448347
+    "lastModifiedOn": 1634137974021
   },
   "creationTag": {
     "versionNumber": 0,
@@ -85,11 +85,14 @@
       },
       {
         "name": "Code",
-        "type": "string",
-        "meaning": "Text"
+        "type": "string"
       },
       {
         "name": "Code_Type",
+        "type": "string"
+      },
+      {
+        "name": "Priority",
         "type": "string"
       }
     ],
