@@ -457,7 +457,7 @@ for _,row in to_load.iterrows():
                     END as "DSL_CLM_TYP"
                     , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
                     , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
-                    , COALESCE (vi_cat.er_cat, adm_cat.er_cat, ipn_cat.er_cat, proc_cat.er_cat) as er_cat_cd
+                    , COALESCE (vi_cat.er_cat, adm_cat.er_cat, ipn_cat.er_cat) as er_cat_cd --professional does not have ER claim column
                 FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
                 INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
                     AND ck.source_schema_cd = clm_li.source_schema_cd
