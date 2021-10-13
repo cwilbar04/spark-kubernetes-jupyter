@@ -67,6 +67,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     ,'professional'
                     ,'other'
                     )
+            , dsl_relevant_key VARCHAR(41) CHARACTER SET LATIN
             , dw_clm_cntrl_key DECIMAL(18,0)
             , claim_line_key VARCHAR(41) CHARACTER SET LATIN
             , dw_clm_key DECIMAL(18,0)
@@ -311,16 +312,16 @@ for _,row in missing_data.iterrows():
                                   'end_date':end_radar
                                  },ignore_index=True)
 
-
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 ## Need to define regex string outside of "f-string" for query to render the backslashes
 ## Use doubles backslash to print an actual backslash
 base_drg_regex = "'^.*(?= W\\/?\\w* {1}(M?CC(\\/MCC)?).*)'"
 
+total_pfins_to_load = len(to_load)
 to_load['bill_pfin'] = to_load['bill_pfin'].astype(str).str.zfill(13)
 start_time = datetime.now()
 print(f'Load process started at {start_time}')
-for _,row in to_load.iterrows():
+for i,row in to_load.iterrows():
     pfin = row['bill_pfin']
     start_date = row['start_date']
     end_date = row['end_date']
@@ -407,6 +408,7 @@ for _,row in to_load.iterrows():
                     , ck.dw_mbr_key
                     , ck.dw_acct_key
              --- Claim Info ---
+                    , COALESCE(vi.dw_visit_key, adm.dw_adm_key, ipn.dw_clm_key, proc.dw_clm_key) as dsl_relevant_key
                     , ck.dw_clm_cntrl_key
                     , ck.dw_clm_key
                     , clm_li.Li_num
@@ -427,8 +429,8 @@ for _,row in to_load.iterrows():
                                 WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
                                 ELSE 'other_institutional'
                             END
-                        WHEN clm_li.clm_filing_cd = '02' THEN 
-                            CASE 
+                        WHEN clm_li.clm_filing_cd = '02' THEN
+                            CASE
                                 WHEN proc.dw_clm_key is NOT NULL THEN 'professional'
                                 ELSE 'professional_not_in_dsl'
                             END
@@ -514,7 +516,7 @@ for _,row in to_load.iterrows():
             b.pos_cat_cd = pos_cat_desc.CODE_CD
             AND b.DSL_CLM_TYP = pos_cat_desc.CODE_CLM_TYP
             AND pos_cat_desc.COLUMN_NAME = 'pos_cat'
-            
+
         LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table er_cat_desc ON
             b.er_cat_cd = er_cat_desc.CODE_CD
             AND b.DSL_CLM_TYP = er_cat_desc.CODE_CLM_TYP
@@ -554,28 +556,28 @@ for _,row in to_load.iterrows():
         'DIAG_CD',
         'RVNU_CD',
         'MAJ_DIAG_CAT_CD')
-   ), drg_mdc AS ( 
+   ), drg_mdc AS (
    --Use DRG from CLM_DRG table with Description & MDC from Version 38 if exists, else actual version.
    --Weights come from actual version
-        SELECT 
+        SELECT
             acrd.dw_clm_key
-            , clmdrg.DRG_CD 
+            , clmdrg.DRG_CD
             , clmdrg.DRG_GRPR_VRSN_NUM
             , COALESCE( dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'Invalid DRG/DRG Version') as drg_desc
             , CASE
                 WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.CMS_DRG_VRSN
                 WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.CMS_DRG_VRSN
-                ELSE -99 
+                ELSE -99
             END as drg_desc_vrsn_num
             , dcd.WEIGHTS as drg_medicare_weight
             , CASE
                 WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.MDC
-                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.MDC 
-                ELSE 'Invalid DRG/DRG Version' 
+                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.MDC
+                ELSE 'Invalid DRG/DRG Version'
               END as maj_diag_cat_cd
-        FROM all_claims_with_rd acrd 
+        FROM all_claims_with_rd acrd
         LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
-            ON clmdrg.DW_CLM_KEY = acrd.dw_clm_key 
+            ON clmdrg.DW_CLM_KEY = acrd.dw_clm_key
         LEFT JOIN PANDA.CMS_DRG_DATA dcd
             ON clmdrg.DRG_CD = dcd.MS_DRG_SPEC_GRP
             AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
@@ -584,7 +586,7 @@ for _,row in to_load.iterrows():
             ON clmdrg.DRG_CD = dcd_most_recent.MS_DRG_SPEC_GRP
             AND dcd_most_recent.CMS_DRG_VRSN = 38
             AND dcd_most_recent.CMS_DRG_TYP = 'CN'
-        WHERE 
+        WHERE
             clmdrg.DRG_TYP_CD = 'H'
         GROUP BY 1,2,3,4,5,6,7
    )
@@ -611,6 +613,7 @@ for _,row in to_load.iterrows():
 
      --- Claim Info ---
             , acrd.claim_type
+            , acrd.dsl_relevant_key
             , acrd.dw_clm_cntrl_key
             , concat(to_char(acrd.dw_clm_key),'-',to_char(acrd.Li_num)) as "claim_line_key"
             , acrd.dw_clm_key
@@ -630,9 +633,9 @@ for _,row in to_load.iterrows():
             , ccs2.diag_desc as icd_10_cm_desc
             , ccs2.CCS_desc as ccsr_category_desc
             , drg_mdc.maj_diag_cat_cd
-            --CMS includes a "PRE" category that is not in EDW Code Table 
-            , CASE 
-                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC' 
+            --CMS includes a "PRE" category that is not in EDW Code Table
+            , CASE
+                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC'
                 ELSE COALESCE(mdc_desc.CODE_TXT,'No MDC Available')
               END as maj_diag_cat_desc
             , drg_mdc.drg_cd
@@ -661,13 +664,13 @@ for _,row in to_load.iterrows():
             , acrd.Svc_To_Dt - acrd.Svc_From_Dt as los
         FROM
             all_claims_with_rd acrd
-            
-            -- Additional Diagnosis info. Manual table load by Stefany Goradia. 
+
+            -- Additional Diagnosis info. Manual table load by Stefany Goradia.
             LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = acrd.primy_diag_cd -- Code descriptions joined to RADAR views.
 
             -- Additional Member Info
             LEFT JOIN mbr_info ON acrd.dw_mbr_key = mbr_info.dw_mbr_key
-    
+
             -- Extra policy info.
     /*     -- Code block removed until further testing identifies how to join to MBR_PLCY without introducing duplication
                         -- This introduces possibility of duplication of lines where there are multiple active policies for a member
@@ -685,10 +688,10 @@ for _,row in to_load.iterrows():
             -- Additional account info.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = acrd.dw_acct_key
                 and acct.now_ind = 'Y'
-                
-            -- MDC & DRG Info    
-            LEFT JOIN drg_mdc ON acrd.dw_clm_key = drg_mdc.dw_clm_key            
-            
+
+            -- MDC & DRG Info
+            LEFT JOIN drg_mdc ON acrd.dw_clm_key = drg_mdc.dw_clm_key
+
             -- Code Table Joins
             LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
                 and cpt_code.column_name = 'HCPCS_CPT_CD'
@@ -700,11 +703,11 @@ for _,row in to_load.iterrows():
                 and rvcode.column_name = 'RVNU_CD'
                 and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
             LEFT JOIN code_table mdc_desc ON mdc_desc.CODE_CD = drg_mdc.maj_diag_cat_cd
-                AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'    
+                AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
                 and acrd.incurd_dt BETWEEN mdc_desc.EFF_DATE and mdc_desc.EXP_DATE
                 ;
 '''
-            print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
+            print(f'loading pfin ({i+1}/{total_pfins_to_load}): {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
             e.query_to_df(query=insert_query)
             start_date = end_date
