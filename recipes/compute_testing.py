@@ -640,7 +640,7 @@ for _,row in to_load.iterrows():
             , drg_mdc.drg_cd
             , drg_mdc.drg_grpr_vrsn_num
             , drg_mdc.drg_desc_vrsn_num
-            , drg_mdc.COALESCE(REGEXP_SUBSTR(a.drg_desc,{base_drg_regex}),a.drg_desc) as base_drg_desc
+            , COALESCE(REGEXP_SUBSTR(drg_mdc.drg_desc,{base_drg_regex}),drg_mdc.drg_desc) as base_drg_desc
             , drg_mdc.drg_desc
             , drg_mdc.drg_medicare_weight
             , acrd.tos_cat_cd
