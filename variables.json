@@ -2,7 +2,7 @@
   "drop_and_recreate_table": true,
   "DATABASE": "RADAR",
   "PREFIX": "RADAR_",
-  "SUFFIX": "_IL_2021_08",
+  "SUFFIX": "_IL_NEW_COLUMNS",
   "prov_finc_id_list_all": [
     "0000000000009",
     "0000000000015",
@@ -40,6 +40,6 @@
     "0000000051046"
   ],
   "prov_finc_id": "",
-  "start_date": "2021-08-01",
-  "end_date": "2021-08-31"
+  "start_date": "2018-01-01",
+  "end_date": "2021-12-31"
 }
