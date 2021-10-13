@@ -424,14 +424,16 @@ for _,row in to_load.iterrows():
                     , CASE
                         WHEN clm_li.clm_filing_cd = '01' THEN
                             CASE
-                                WHEN vi.dw_clm_key is not NULL THEN 'institutional_outpatient_visit'
-                                WHEN adm.dw_clm_key is not NULL THEN 'institutional_inpatient_admission'
+                                WHEN vi.dw_visit_key is not NULL THEN 'institutional_outpatient_visit'
+                                WHEN adm.dw_adm_key is not NULL THEN 'institutional_inpatient_admission'
                                 WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
                                 ELSE 'other_institutional'
                             END
                         WHEN clm_li.clm_filing_cd = '02' THEN 
                             CASE 
-                                WHEN 'professional'
+                                WHEN proc.dw_clm_key is NOT NULL THEN 'professional'
+                                ELSE 'professional_not_in_dsl'
+                            END
                         ELSE 'other_not_01_or_02_why'
                     END as claim_type
                     -- Outpatient visits in DSL can be split in to multiple lines with the same values for all
@@ -625,13 +627,13 @@ for _,row in to_load.iterrows():
             , CASE
                  WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
                  ELSE cpt_code.code_txt
-            END AS "hcpcs_or_rvnu_desc"
+            END AS hcpcs_or_rvnu_desc
             , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
             , ccs2.diag_desc as icd_10_cm_desc
             , ccs2.CCS_desc as ccsr_category_desc
             , drg_mdc.maj_diag_cat_cd
-            , --CMS includes a "PRE" category that is not in EDW Code Table 
-             CASE 
+            --CMS includes a "PRE" category that is not in EDW Code Table 
+            , CASE 
                 WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC' 
                 ELSE COALESCE(mdc_desc.CODE_TXT,'No MDC Available')
               END as maj_diag_cat_desc
@@ -648,17 +650,17 @@ for _,row in to_load.iterrows():
             , acrd.er_cat_cd
             , acrd.er_cat_desc
             --, plcy.fincl_arngmt_cd -- commented out for now. need to solve duplication issues before including if needed in future
-            --, plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
+            --, plcy_code.code_txt as fincl_arngmt_cd_desc
             , acrd.billd_amt
             , acrd.prov_alwd_amt
             , acrd.net_elig_amt
             , acrd.net_elig_rd_amt
             , acrd.net_pd_rd_amt
             , CASE
-                WHEN acrd.net_elig_rd_amt IS NULL then acrd.net_elig_amt
+                WHEN acrd.net_elig_rd_amt IS NULL THEN acrd.net_elig_amt
                 ELSE acrd.net_pd_rd_amt
             END as net_elig_or_rd_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
-            ,acrd.Svc_To_Dt - acrd.Svc_From_Dt as LOS
+            , acrd.Svc_To_Dt - acrd.Svc_From_Dt as los
         FROM
             all_claims_with_rd acrd
             
@@ -685,6 +687,8 @@ for _,row in to_load.iterrows():
             -- Additional account info.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = acrd.dw_acct_key
                 and acct.now_ind = 'Y'
+                
+            -- MDC & DRG Info    
             LEFT JOIN drg_mdc ON acrd.dw_clm_key = drg_mdc.dw_clm_key            
             
             -- Code Table Joins
@@ -700,9 +704,6 @@ for _,row in to_load.iterrows():
             LEFT JOIN code_table mdc_desc ON mdc_desc.CODE_CD = drg_mdc.maj_diag_cat_cd
                 AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'    
                 and acrd.incurd_dt BETWEEN mdc_dec.EFF_DATE and mdc_desc.EXP_DATE
-
-
-
                 ;
 '''
             print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
