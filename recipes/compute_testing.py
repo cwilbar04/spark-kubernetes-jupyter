@@ -82,9 +82,6 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , primy_diag_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , icd_10_cm_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , ccsr_category_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , drg_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
-            , base_drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , maj_diag_cat_cd CHAR(3) CHARACTER SET LATIN
                 COMPRESS ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
                     , '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', 'PRE')
@@ -118,6 +115,12 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     , 'PRE-MDC'
                     , 'PREGNANCY, CHILDBIRTH, AND THE PUERPERIUM'
                 )
+            , drg_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_grpr_vrsn_num INTEGER COMPRESS (0, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38)
+            , drg_desc_vrsn_num INTEGER COMPRESS (35, 36, 37, 38)
+            , base_drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_medicare_weight FLOAT COMPRESS(NULL)
             , tos_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('40', '50', '57', '60', '61', '63', '65', '70', '71', '72', '73', '74', '75', '76',
                     '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91',
@@ -549,47 +552,41 @@ for _,row in to_load.iterrows():
         column_name in(
         'HCPCS_CPT_CD',
         'DIAG_CD',
-        'RVNU_CD')
-   ), drg_codes AS (
-   SELECT
-        DISTINCT
-        CASE
-            WHEN "MDC_CD" = 'PRE' THEN 'PRE-MDC'
-            ELSE COALESCE(mdc_desc.CODE_TXT,'NO MDC AVAILABLE')
-        END as "MDC Description"
-        , a.MDC_CD
-        , a."DRG_CD"
-        , a."DRG Description"
-        , COALESCE(REGEXP_SUBSTR(a."DRG Description",{base_drg_regex}),a."DRG Description") as "BASE_DRG_DESCRIPTION"
-    FROM
-        (
-        SELECT
-                MAJ_DIAG_CAT_CD,
-                dcd.MDC as "CMS_MDC_VERSION",
-                dcd_most_recent.MDC as "CMS_MDC_MOST_RECENT_VERSION",
-                CASE
-                    WHEN dcd_most_recent.MS_DRG_TITLE is NULL THEN dcd.MDC
-                    ELSE dcd_most_recent.MDC
-                END as "MDC_CD",
-                DRG_CD,
-                DRG_GRPR_VRSN_NUM,
-                dcd.MS_DRG_TITLE as "CMS_VERSION_DRG_DESCRIPTION",
-                dcd_most_recent.MS_DRG_TITLE as "CMS_MOST_RECENT_VERSION_DRG_DESCRIPTION",
-                COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"
-            FROM ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
-            LEFT JOIN PANDA.CMS_DRG_DATA dcd
-                ON clmdrg.DRG_CD = dcd.MS_DRG_SPEC_GRP
-                AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
-                AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
-            LEFT JOIN PANDA.CMS_DRG_DATA dcd_most_recent
-                ON clmdrg.DRG_CD = dcd_most_recent.MS_DRG_SPEC_GRP
-                AND dcd_most_recent.CMS_DRG_VRSN = 38
-                AND dcd_most_recent.CMS_DRG_TYP = 'CN'
-            WHERE clmdrg.DRG_TYP_CD = 'H' and clmdrg.DRG_GRPR_VRSN_NUM > 34
-            GROUP BY 1,2,3,4,5,6,7,8,9
-            ) a
-        LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE mdc_desc ON mdc_desc.CODE_CD = a.MDC_CD
-            AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
+        'RVNU_CD',
+        'MAJ_DIAG_CAT_CD')
+   ), drg_mdc AS ( 
+   --Use DRG from CLM_DRG table with Description & MDC from Version 38 if exists, else actual version.
+   --Weights come from actual version
+        SELECT 
+            acrd.dw_clm_key
+            , clmdrg.DRG_CD 
+            , clmdrg.DRG_GRPR_VRSN_NUM
+            , COALESCE( dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'Invalid DRG/DRG Version') as drg_desc
+            , CASE
+                WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.CMS_DRG_VRSN
+                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.CMS_DRG_VRSN
+                ELSE -99 
+            END as drg_desc_vrsn_num
+            , dcd.WEIGHTS as drg_medicare_weight
+            , CASE
+                WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.MDC
+                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.MDC 
+                ELSE 'Invalid DRG/DRG Version' 
+              END as maj_diag_cat_cd
+        FROM all_claims_with_rd acrd 
+        LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
+            ON clmdrg.DW_CLM_KEY = acrd.dw_clm_key 
+        LEFT JOIN PANDA.CMS_DRG_DATA dcd
+            ON clmdrg.DRG_CD = dcd.MS_DRG_SPEC_GRP
+            AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
+            AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
+        LEFT JOIN PANDA.CMS_DRG_DATA dcd_most_recent
+            ON clmdrg.DRG_CD = dcd_most_recent.MS_DRG_SPEC_GRP
+            AND dcd_most_recent.CMS_DRG_VRSN = 38
+            AND dcd_most_recent.CMS_DRG_TYP = 'CN'
+        WHERE 
+            clmdrg.DRG_TYP_CD = 'H'
+        GROUP BY 1,2,3,4,5,6,7
    )
 
         SELECT
@@ -632,11 +629,17 @@ for _,row in to_load.iterrows():
             , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
             , ccs2.diag_desc as icd_10_cm_desc
             , ccs2.CCS_desc as ccsr_category_desc
-            , clmdrg.drg_cd
-            , drg_codes.BASE_DRG_DESCRIPTION
-            , drg_codes."DRG Description"
-            , clmdrg.maj_diag_cat_cd
-            , drg_codes."MDC Description" as maj_diag_cat_desc
+            , drg_mdc.maj_diag_cat_cd
+            , CASE 
+                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC' --CMS includes a "PRE" category that is not in EDW Code Table
+                ELSE COALESCE(mdc_desc.CODE_TXT,'No MDC Available')
+              END as maj_diag_cat_desc
+            , drg_mdc.drg_cd
+            , drg_mdc.drg_grpr_vrsn_num
+            , drg_mdc.drg_desc_vrsn_num
+            , drg_mdc.COALESCE(REGEXP_SUBSTR(a.drg_desc,{base_drg_regex}),a.drg_desc) as base_drg_desc
+            , drg_mdc.drg_desc
+            , drg_mdc.drg_medicare_weight
             , acrd.tos_cat_cd
             , acrd.tos_cat_desc
             , acrd.pos_cat_cd
@@ -656,24 +659,15 @@ for _,row in to_load.iterrows():
             END as net_elig_or_rd_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
             ,acrd.Svc_To_Dt - acrd.Svc_From_Dt as LOS
         FROM
-            --- Base RADAR tables ---
             all_claims_with_rd acrd
+            
+            -- Additional Diagnosis info. Manual table load by Stefany Goradia. 
             LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = acrd.primy_diag_cd -- Code descriptions joined to RADAR views.
 
-            LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
-                and cpt_code.column_name = 'HCPCS_CPT_CD'
-                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
-            LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
-                and diag.column_name = 'DIAG_CD'
-                and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
-            LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
-                and rvcode.column_name = 'RVNU_CD'
-                and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
-
-            --- Base RADAR tables ---
             -- Additional Member Info
             LEFT JOIN mbr_info ON acrd.dw_mbr_key = mbr_info.dw_mbr_key
-    -- Extra policy info.
+    
+            -- Extra policy info.
     /*     -- Code block removed until further testing identifies how to join to MBR_PLCY without introducing duplication
                         -- This introduces possibility of duplication of lines where there are multiple active policies for a member
                         -- and the active policies have different FINCL_ARNGMT_CD.
@@ -690,10 +684,23 @@ for _,row in to_load.iterrows():
             -- Additional account info.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = acrd.dw_acct_key
                 and acct.now_ind = 'Y'
-            -- Get DRG from CLM_DRG table and use associated MDC
-            LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
-                and clmdrg.DRG_TYP_CD = 'H'
-            LEFT JOIN drg_codes ON clmdrg.DRG_CD = drg_codes.DRG_CD
+            LEFT JOIN drg_mdc ON acrd.dw_clm_key = drg_mdc.dw_clm_key            
+            
+            -- Code Table Joins
+            LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
+                and cpt_code.column_name = 'HCPCS_CPT_CD'
+                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
+            LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
+                and diag.column_name = 'DIAG_CD'
+                and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
+            LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
+                and rvcode.column_name = 'RVNU_CD'
+                and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
+            LEFT JOIN code_table mdc_desc ON mdc_desc.CODE_CD = drg_mdc.maj_diag_cat_cd
+                AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'    
+                and acrd.incurd_dt BETWEEN mdc_dec.EFF_DATE and mdc_desc.EXP_DATE
+
+
 
                 ;
 '''
