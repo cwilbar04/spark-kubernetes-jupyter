@@ -311,8 +311,6 @@ for _,row in missing_data.iterrows():
                                   'end_date':end_radar
                                  },ignore_index=True)
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-#to_load
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 ## Need to define regex string outside of "f-string" for query to render the backslashes
