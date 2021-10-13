@@ -623,9 +623,9 @@ for _,row in to_load.iterrows():
             , acrd.HCPCS_CPT_Cd
             , cpt_code.code_txt as hcpcs_cpt_cd_desc
             , acrd.rvnu_cd
-            , rvcode.code_txt as rvnu_cd_desc
+            , regexp_replace(rvcode.code_txt,' STANDARD ABBREVIATION:.*', '') as rvnu_cd_desc
             , CASE
-                 WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
+                 WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvnu_cd_desc
                  ELSE cpt_code.code_txt
             END AS hcpcs_or_rvnu_desc
             , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
