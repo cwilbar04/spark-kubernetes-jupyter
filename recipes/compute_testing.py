@@ -67,7 +67,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     ,'professional'
                     ,'other'
                     )
-            , dsl_relevant_key DECIMAL(18,0) CHARACTER SET LATIN
+            , dsl_relevant_key DECIMAL(18,0)
             , dw_clm_cntrl_key DECIMAL(18,0)
             , claim_line_key VARCHAR(41) CHARACTER SET LATIN
             , dw_clm_key DECIMAL(18,0)
