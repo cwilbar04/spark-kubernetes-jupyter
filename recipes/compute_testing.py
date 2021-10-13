@@ -623,15 +623,16 @@ for _,row in to_load.iterrows():
             , acrd.rvnu_cd
             , rvcode.code_txt as rvnu_cd_desc
             , CASE
-             WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
-                ELSE cpt_code.code_txt
+                 WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
+                 ELSE cpt_code.code_txt
             END AS "hcpcs_or_rvnu_desc"
             , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
             , ccs2.diag_desc as icd_10_cm_desc
             , ccs2.CCS_desc as ccsr_category_desc
             , drg_mdc.maj_diag_cat_cd
-            , CASE 
-                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC' --CMS includes a "PRE" category that is not in EDW Code Table
+            , --CMS includes a "PRE" category that is not in EDW Code Table 
+             CASE 
+                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC' 
                 ELSE COALESCE(mdc_desc.CODE_TXT,'No MDC Available')
               END as maj_diag_cat_desc
             , drg_mdc.drg_cd
