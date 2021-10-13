@@ -202,7 +202,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                 )
             , er_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('10', '20')
-            , er_cat_desc
+            , er_cat_desc CHAR(10)
                 COMPRESS ('ER', 'Non-ER')
             --, fincl_arngmnt_cd CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
             --, fincl_arngmnt_desc VARCHAR(255) CHARACTER SET LATIN
