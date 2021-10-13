@@ -44,7 +44,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
          (
             --- Provider Info ---
             bill_pfin VARCHAR(30) CHARACTER SET LATIN COMPRESS {*recipe_vars["prov_finc_id_list_all"],}
-            , bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN COMPRESS {*[z[-10:] for z in recipe_vars["prov_finc_id_list_all"]],}
+            , bill_pfin_10trimmed CHAR(10) CHARACTER SET LATIN COMPRESS {*[z[-10:] for z in recipe_vars["prov_finc_id_list_all"]],}
             , provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN
             , provider_payee_name VARCHAR(50) CHARACTER SET LATIN
             , primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL) --more than 255 distinct values
@@ -73,8 +73,8 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , li_num DECIMAL(4,0)
             , incurd_dt DATE FORMAT 'YY/MM/DD'
             , incurd_month DATE FORMAT 'YY/MM/DD'
-            , inpat_outpat_cd VARCHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
-            , hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
+            , inpat_outpat_cd CHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
+            , hcpcs_cpt_cd VARCHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
             , hcpcs_cpt_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , rvnu_cd CHAR(4) CHARACTER SET LATIN COMPRESS(NULL)
             , rvnu_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
@@ -82,7 +82,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , primy_diag_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , icd_10_cm_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , ccsr_category_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , maj_diag_cat_cd CHAR(3) CHARACTER SET LATIN
+            , maj_diag_cat_cd VARCHAR(3) CHARACTER SET LATIN
                 COMPRESS ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
                     , '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', 'PRE')
             , maj_diag_cat_desc VARCHAR(255) CHARACTER SET LATIN
@@ -125,7 +125,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                 COMPRESS ('40', '50', '57', '60', '61', '63', '65', '70', '71', '72', '73', '74', '75', '76',
                     '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91',
                     '92', '93', '94', '95', '96', '97', '98', '99', 'BF', 'BN', 'GE')
-            , tos_cat_desc CHAR(255) CHARACTER SET LATIN
+            , tos_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'All other imaging (Institutional)'
                     --, 'Allergy'
@@ -176,7 +176,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , pos_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('AB', 'AH', 'AS', 'CD', 'ER', 'HO', 'HV', 'IP', 'MH', 'MO', 'NE', 'NP'
                 , 'NR', 'NS', 'NT', 'OP', 'OT', 'OV', 'RH', 'RT')
-            , pos_cat_desc CHAR(255) CHARACTER SET LATIN
+            , pos_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'Acute Hospital'
                     , 'Ambulance'
@@ -202,7 +202,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
                 )
             , er_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('10', '20')
-            , er_cat_desc CHAR(10)
+            , er_cat_desc VARCHAR(10)
                 COMPRESS ('ER', 'Non-ER')
             --, fincl_arngmnt_cd CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
             --, fincl_arngmnt_desc VARCHAR(255) CHARACTER SET LATIN
