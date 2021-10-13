@@ -37,11 +37,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 1,
+    "versionNumber": 2,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1634138176488
+    "lastModifiedOn": 1634138181065
   },
   "creationTag": {
     "versionNumber": 0,
@@ -73,7 +73,8 @@
       },
       {
         "name": "Code",
-        "type": "string"
+        "type": "string",
+        "meaning": "Text"
       },
       {
         "name": "Code_Type",
