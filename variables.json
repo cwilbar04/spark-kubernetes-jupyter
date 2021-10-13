@@ -1,5 +1,5 @@
 {
-  "drop_and_recreate_table": true,
+  "drop_and_recreate_table": false,
   "DATABASE": "RADAR",
   "PREFIX": "RADAR_",
   "SUFFIX": "_IL_2021_08",
