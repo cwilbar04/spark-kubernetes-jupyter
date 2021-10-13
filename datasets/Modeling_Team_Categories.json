@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 6,
+    "versionNumber": 7,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632927532079
+    "lastModifiedOn": 1634138217849
   },
   "creationTag": {
     "versionNumber": 0,
@@ -82,6 +82,10 @@
         "name": "Code_Type",
         "type": "string",
         "maxLength": 500
+      },
+      {
+        "name": "Priority",
+        "type": "bigint"
       },
       {
         "name": "load_date",
