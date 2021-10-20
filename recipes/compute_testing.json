@@ -16,7 +16,16 @@
   },
   "redispatchPartitioning": false,
   "maxRunningActivities": 0,
-  "inputs": {},
+  "inputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "Modeling_Team_Categories",
+          "deps": []
+        }
+      ]
+    }
+  },
   "outputs": {
     "main": {
       "items": [
@@ -28,11 +37,11 @@
     }
   },
   "versionTag": {
-    "versionNumber": 70,
+    "versionNumber": 110,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1632163927629
+    "lastModifiedOn": 1634229758527
   },
   "creationTag": {
     "versionNumber": 0,

@@ -28,11 +28,11 @@
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 20,
+    "versionNumber": 22,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1631917447443
+    "lastModifiedOn": 1632946983700
   },
   "creationTag": {
     "versionNumber": 0,
@@ -121,6 +121,12 @@
         "type": "string",
         "originalType": "VARCHAR",
         "maxLength": 50
+      },
+      {
+        "name": "claim_type",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 35
       },
       {
         "name": "dw_clm_cntrl_key",
@@ -216,6 +222,12 @@
         "maxLength": 3
       },
       {
+        "name": "BASE_DRG_DESCRIPTION",
+        "type": "string",
+        "originalType": "VARCHAR",
+        "maxLength": 255
+      },
+      {
         "name": "DRG Description",
         "type": "string",
         "originalType": "VARCHAR",
@@ -225,7 +237,7 @@
         "name": "maj_diag_cat_cd",
         "type": "string",
         "originalType": "CHAR",
-        "maxLength": 2
+        "maxLength": 3
       },
       {
         "name": "Major Diagnostic Category (MDC)",
@@ -237,7 +249,7 @@
         "name": "tos_cat_cd",
         "type": "string",
         "originalType": "CHAR",
-        "maxLength": 3
+        "maxLength": 2
       },
       {
         "name": "tos_cat",

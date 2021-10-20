@@ -1,12 +1,14 @@
 {
-  "type": "sql_script",
+  "type": "python",
   "neverRecomputeExistingPartitions": false,
   "optionalDependencies": false,
   "params": {
-    "allowMultipleConnections": false,
-    "usePsql": true,
-    "inferOutputDatasetsSchema": true,
-    "statementsParsingMode": "SPLIT",
+    "envSelection": {
+      "envMode": "INHERIT"
+    },
+    "containerSelection": {
+      "containerMode": "INHERIT"
+    },
     "skipPrerunValidate": false
   },
   "customMeta": {
@@ -14,30 +16,39 @@
   },
   "redispatchPartitioning": false,
   "maxRunningActivities": 0,
-  "inputs": {},
+  "inputs": {
+    "main": {
+      "items": [
+        {
+          "ref": "Contract_Category_Table_Latest",
+          "deps": []
+        }
+      ]
+    }
+  },
   "outputs": {
     "main": {
       "items": [
         {
-          "ref": "RADAR_CONTRACT_MONITORING_VIEW",
+          "ref": "Modeling_Team_Categories",
           "appendMode": false
         }
       ]
     }
   },
   "versionTag": {
-    "versionNumber": 5,
+    "versionNumber": 10,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630341631185
+    "lastModifiedOn": 1634329148490
   },
   "creationTag": {
     "versionNumber": 0,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630339660883
+    "lastModifiedOn": 1632435320488
   },
   "tags": [],
   "customFields": {},

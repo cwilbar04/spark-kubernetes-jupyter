@@ -44,7 +44,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
          (
             --- Provider Info ---
             bill_pfin VARCHAR(30) CHARACTER SET LATIN COMPRESS {*recipe_vars["prov_finc_id_list_all"],}
-            , bill_pfin_10trimmed VARCHAR(30) CHARACTER SET LATIN COMPRESS {*[z[-10:] for z in recipe_vars["prov_finc_id_list_all"]],}
+            , bill_pfin_10trimmed CHAR(10) CHARACTER SET LATIN COMPRESS {*[z[-10:] for z in recipe_vars["prov_finc_id_list_all"]],}
             , provider_bill_pfin_name VARCHAR(50) CHARACTER SET LATIN
             , provider_payee_name VARCHAR(50) CHARACTER SET LATIN
             , primy_prcg_prov_spclty_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL) --more than 255 distinct values
@@ -55,7 +55,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             --,age INTEGER -- commented out for now as not needed. consider age grouping if needed in future
             , mbr_zip VARCHAR(12) CHARACTER SET LATIN COMPRESS(NULL)
             , mbr_city VARCHAR(28) CHARACTER SET LATIN COMPRESS(NULL)
-            , ACCT_NAME VARCHAR(50) CHARACTER SET LATIN COMPRESS(NULL)
+            , acct_name VARCHAR(50) CHARACTER SET LATIN COMPRESS(NULL)
 
             --- Claim Info ---
             , claim_type VARCHAR(35) CHARACTER SET LATIN
@@ -67,28 +67,26 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     ,'professional'
                     ,'other'
                     )
+            , dsl_relevant_key DECIMAL(18,0)
             , dw_clm_cntrl_key DECIMAL(18,0)
             , claim_line_key VARCHAR(41) CHARACTER SET LATIN
             , dw_clm_key DECIMAL(18,0)
             , li_num DECIMAL(4,0)
             , incurd_dt DATE FORMAT 'YY/MM/DD'
             , incurd_month DATE FORMAT 'YY/MM/DD'
-            , inpat_outpat_cd VARCHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
-            , hcpcs_cpt_cd CHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
-            , HCPCS_CPT_Code_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , inpat_outpat_cd CHAR(1) CHARACTER SET LATIN COMPRESS ('!', '1', '2', '3')
+            , hcpcs_cpt_cd VARCHAR(6) CHARACTER SET LATIN COMPRESS(NULL)
+            , hcpcs_cpt_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
             , rvnu_cd CHAR(4) CHARACTER SET LATIN COMPRESS(NULL)
-            , RevCD_Desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , HCPC_OR_REV_DESC VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , prim_diag VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "ICD-10-CM Codes Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "CCSR Category Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , DRG_CD CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
-            , BASE_DRG_DESCRIPTION VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , "DRG Description" VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
-            , maj_diag_cat_cd CHAR(3) CHARACTER SET LATIN
+            , rvnu_cd_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , hcpcs_or_rvnu_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , primy_diag_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , icd_10_cm_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , ccsr_category_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , maj_diag_cat_cd VARCHAR(3) CHARACTER SET LATIN
                 COMPRESS ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
                     , '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', 'PRE')
-            , "Major Diagnostic Category (MDC)" VARCHAR(255) CHARACTER SET LATIN
+            , maj_diag_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'ALCOHOL / SUBSTANCE ABUSE USE AND ALCOHOL / SUBSTANCE INDUCED ORGANIC MENTAL DISORDERS'
                     , 'BURNS'
@@ -118,11 +116,17 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     , 'PRE-MDC'
                     , 'PREGNANCY, CHILDBIRTH, AND THE PUERPERIUM'
                 )
+            , drg_cd CHAR(3) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_grpr_vrsn_num INTEGER COMPRESS (0, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38)
+            , drg_desc_vrsn_num INTEGER COMPRESS (35, 36, 37, 38)
+            , base_drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_desc VARCHAR(255) CHARACTER SET LATIN COMPRESS(NULL)
+            , drg_medicare_weight FLOAT COMPRESS(NULL)
             , tos_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('40', '50', '57', '60', '61', '63', '65', '70', '71', '72', '73', '74', '75', '76',
                     '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91',
                     '92', '93', '94', '95', '96', '97', '98', '99', 'BF', 'BN', 'GE')
-            , tos_cat CHAR(255) CHARACTER SET LATIN
+            , tos_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'All other imaging (Institutional)'
                     --, 'Allergy'
@@ -173,7 +177,7 @@ if recipe_vars['drop_and_recreate_table'] is True:
             , pos_cat_cd CHAR(2) CHARACTER SET LATIN
                 COMPRESS ('AB', 'AH', 'AS', 'CD', 'ER', 'HO', 'HV', 'IP', 'MH', 'MO', 'NE', 'NP'
                 , 'NR', 'NS', 'NT', 'OP', 'OT', 'OV', 'RH', 'RT')
-            , pos_cat CHAR(255) CHARACTER SET LATIN
+            , pos_cat_desc VARCHAR(255) CHARACTER SET LATIN
                 COMPRESS (
                     'Acute Hospital'
                     , 'Ambulance'
@@ -197,15 +201,19 @@ if recipe_vars['drop_and_recreate_table'] is True:
                     , 'Retail'
                     , 'Skilled Nursing Facility  (Non-Acute)'
                 )
-            --, FINCL_ARNGMT_CD CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
-            --, FINCL_ARNGMT_CD_Desc VARCHAR(255) CHARACTER SET LATIN
+            , er_cat_cd CHAR(2) CHARACTER SET LATIN
+                COMPRESS ('10', '20')
+            , er_cat_desc VARCHAR(10)
+                COMPRESS ('ER', 'Non-ER')
+            --, fincl_arngmnt_cd CHAR(4) CHARACTER SET LATIN -- commented out for now. need to solve duplication issues before including if needed in future
+            --, fincl_arngmnt_desc VARCHAR(255) CHARACTER SET LATIN
             , billd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
             , prov_alwd_amt DECIMAL(11,2) COMPRESS (0.00) --cannot specify likely values
             , net_elig_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
             , net_elig_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
             , net_pd_rd_amt DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
-            , Net_Elig_or_RD_pd DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
-            , LOS INTEGER COMPRESS (0,1,2,3,4,5,6,7) --compress most likely values
+            , net_elig_or_rd_pd DECIMAL(15,2) COMPRESS (0.00) --cannot specify likely values
+            , los INTEGER COMPRESS (0,1,2,3,4,5,6,7) --compress most likely values
     )
     PRIMARY INDEX ( dw_clm_key ,li_num )
     '''
@@ -305,13 +313,15 @@ for _,row in missing_data.iterrows():
                                  },ignore_index=True)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-#to_load
+## Need to define regex string outside of "f-string" for query to render the backslashes
+## Use doubles backslash to print an actual backslash
+base_drg_regex = "'^.*(?= W\\/?\\w* {1}(M?CC(\\/MCC)?).*)'"
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+total_pfins_to_load = len(to_load)
 to_load['bill_pfin'] = to_load['bill_pfin'].astype(str).str.zfill(13)
 start_time = datetime.now()
 print(f'Load process started at {start_time}')
-for _,row in to_load.iterrows():
+for i,row in to_load.iterrows():
     pfin = row['bill_pfin']
     start_date = row['start_date']
     end_date = row['end_date']
@@ -324,8 +334,9 @@ for _,row in to_load.iterrows():
     WITH all_claims_with_rd AS (
         SELECT
             b.*
-            , tos_cat_desc.CODE_TXT as tos_cat
-            , pos_cat_desc.CODE_TXT as pos_cat
+            , TRIM(tos_cat_desc.CODE_TXT) as tos_cat_desc
+            , TRIM(pos_cat_desc.CODE_TXT) as pos_cat_desc
+            , TRIM(er_cat_desc.CODE_TXT) as er_cat_desc
             , CASE
                 WHEN claim_type = 'institutional_outpatient_visit' THEN
                     sum(net_elig_proportion) OVER
@@ -397,6 +408,7 @@ for _,row in to_load.iterrows():
                     , ck.dw_mbr_key
                     , ck.dw_acct_key
              --- Claim Info ---
+                    , COALESCE(vi.dw_visit_key, adm.dw_adm_key, ipn.dw_clm_key, proc.dw_clm_key) as dsl_relevant_key
                     , ck.dw_clm_cntrl_key
                     , ck.dw_clm_key
                     , clm_li.Li_num
@@ -412,12 +424,16 @@ for _,row in to_load.iterrows():
                     , CASE
                         WHEN clm_li.clm_filing_cd = '01' THEN
                             CASE
-                                WHEN vi.dw_clm_key is not NULL THEN 'institutional_outpatient_visit'
-                                WHEN adm.dw_clm_key is not NULL THEN 'institutional_inpatient_admission'
+                                WHEN vi.dw_visit_key is not NULL THEN 'institutional_outpatient_visit'
+                                WHEN adm.dw_adm_key is not NULL THEN 'institutional_inpatient_admission'
                                 WHEN ipn.dw_clm_key is not NULL THEN 'institutional_inpatient_other'
                                 ELSE 'other_institutional'
                             END
-                        WHEN clm_li.clm_filing_cd = '02' THEN 'professional'
+                        WHEN clm_li.clm_filing_cd = '02' THEN
+                            CASE
+                                WHEN proc.dw_clm_key is NOT NULL THEN 'professional'
+                                ELSE 'professional_not_in_dsl'
+                            END
                         ELSE 'other_not_01_or_02_why'
                     END as claim_type
                     -- Outpatient visits in DSL can be split in to multiple lines with the same values for all
@@ -441,6 +457,7 @@ for _,row in to_load.iterrows():
                     END as "DSL_CLM_TYP"
                     , COALESCE (vi_cat.tos_cat, adm_cat.tos_cat, ipn_cat.tos_cat, proc_cat.tos_cat) as tos_cat_cd
                     , COALESCE (vi_cat.pos_cat, adm_cat.pos_cat, ipn_cat.pos_cat, proc_cat.pos_cat) as pos_cat_cd
+                    , COALESCE (vi_cat.er_cat, adm_cat.er_cat, ipn_cat.er_cat) as er_cat_cd --professional does not have ER claim column
                 FROM "RADAR_VIEWS"."radardm_prod_claim" AS ck
                 INNER JOIN RADAR_VIEWS.radardm_prod_claim_line AS clm_li ON ck.dw_clm_key = clm_li.dw_clm_key
                     AND ck.source_schema_cd = clm_li.source_schema_cd
@@ -499,6 +516,11 @@ for _,row in to_load.iterrows():
             b.pos_cat_cd = pos_cat_desc.CODE_CD
             AND b.DSL_CLM_TYP = pos_cat_desc.CODE_CLM_TYP
             AND pos_cat_desc.COLUMN_NAME = 'pos_cat'
+
+        LEFT JOIN ENTPR_BP_ADS_VIEWS.dsl_code_table er_cat_desc ON
+            b.er_cat_cd = er_cat_desc.CODE_CD
+            AND b.DSL_CLM_TYP = er_cat_desc.CODE_CLM_TYP
+            AND er_cat_desc.COLUMN_NAME = 'er_cat'
     )
     , mbr_info AS (
         SELECT
@@ -532,48 +554,41 @@ for _,row in to_load.iterrows():
         column_name in(
         'HCPCS_CPT_CD',
         'DIAG_CD',
-        'RVNU_CD')
-   ), drg_codes AS (
-   SELECT
-        DISTINCT
-        CASE
-            WHEN "MDC_CD" = 'PRE' THEN 'PRE-MDC'
-            ELSE COALESCE(mdc_desc.CODE_TXT,'NO MDC AVAILABLE')
-        END as "MDC Description"
-        , a.MDC_CD
-        , a."DRG_CD"
-        , a."DRG Description"
-        , COALESCE(REGEXP_SUBSTR(a."DRG Description",'^.*(?= W\/?\w* {1}(M?CC(\/MCC)?).*)'),a."DRG Description") as "BASE_DRG_DESCRIPTION"
-    FROM
-        (
+        'RVNU_CD',
+        'MAJ_DIAG_CAT_CD')
+   ), drg_mdc AS (
+   --Use DRG from CLM_DRG table with Description & MDC from Version 38 if exists, else actual version.
+   --Weights come from actual version
         SELECT
-                MAJ_DIAG_CAT_CD,
-                dcd.MDC as "CMS_MDC_VERSION",
-                dcd_most_recent.MDC as "CMS_MDC_MOST_RECENT_VERSION",
-                CASE
-                    WHEN dcd_most_recent.MS_DRG_TITLE is NULL THEN dcd.MDC
-                    ELSE dcd_most_recent.MDC
-                END as "MDC_CD",
-                DRG_CD,
-                DRG_GRPR_VRSN_NUM,
-                dcd.MS_DRG_TITLE as "CMS_VERSION_DRG_DESCRIPTION",
-                dcd_most_recent.MS_DRG_TITLE as "CMS_MOST_RECENT_VERSION_DRG_DESCRIPTION",
-                COALESCE(dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'NOT AVAILABLE') as "DRG Description"
-            FROM ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
-            LEFT JOIN PANDA.DRG_CMS_DATA dcd
-                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd.MS_DRG_SPEC_GRP), 3)
-                AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
-                AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
-            LEFT JOIN PANDA.DRG_CMS_DATA dcd_most_recent
-                ON clmdrg.DRG_CD = RIGHT(concat('000',dcd_most_recent.MS_DRG_SPEC_GRP), 3)
-                AND dcd_most_recent.CMS_DRG_VRSN = 38
-                AND dcd_most_recent.CMS_DRG_TYP = 'CN'
-            WHERE clmdrg.DRG_TYP_CD = 'H' and clmdrg.DRG_GRPR_VRSN_NUM > 34
-            --and EXISTS (SELECT 1 FROM "RADAR"."RADAR_CONTRACT_MONITORING_IL" a WHERE a.dw_clm_key = clmdrg.DW_CLM_KEY)
-            GROUP BY 1,2,3,4,5,6,7,8,9
-            ) a
-        LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CODE_TABLE mdc_desc ON mdc_desc.CODE_CD = a.MDC_CD
-            AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
+            acrd.dw_clm_key
+            , clmdrg.DRG_CD
+            , clmdrg.DRG_GRPR_VRSN_NUM
+            , COALESCE( dcd_most_recent.MS_DRG_TITLE, dcd.MS_DRG_TITLE, 'Invalid DRG/DRG Version') as drg_desc
+            , CASE
+                WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.CMS_DRG_VRSN
+                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.CMS_DRG_VRSN
+                ELSE -99
+            END as drg_desc_vrsn_num
+            , dcd.WEIGHTS as drg_medicare_weight
+            , CASE
+                WHEN dcd_most_recent.MS_DRG_TITLE is not NULL THEN dcd_most_recent.MDC
+                WHEN dcd.MS_DRG_TITLE is not NULL THEN dcd.MDC
+                ELSE 'Invalid DRG/DRG Version'
+              END as maj_diag_cat_cd
+        FROM all_claims_with_rd acrd
+        LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg
+            ON clmdrg.DW_CLM_KEY = acrd.dw_clm_key
+        LEFT JOIN PANDA.CMS_DRG_DATA dcd
+            ON clmdrg.DRG_CD = dcd.MS_DRG_SPEC_GRP
+            AND clmdrg.DRG_GRPR_VRSN_NUM = dcd.CMS_DRG_VRSN
+            AND (dcd.CMS_DRG_TYP = 'CN' OR dcd.CMS_DRG_VRSN = 36) -- Version 36 does not have a CN version
+        LEFT JOIN PANDA.CMS_DRG_DATA dcd_most_recent
+            ON clmdrg.DRG_CD = dcd_most_recent.MS_DRG_SPEC_GRP
+            AND dcd_most_recent.CMS_DRG_VRSN = 38
+            AND dcd_most_recent.CMS_DRG_TYP = 'CN'
+        WHERE
+            clmdrg.DRG_TYP_CD = 'H'
+        GROUP BY 1,2,3,4,5,6,7
    )
 
         SELECT
@@ -598,6 +613,7 @@ for _,row in to_load.iterrows():
 
      --- Claim Info ---
             , acrd.claim_type
+            , acrd.dsl_relevant_key
             , acrd.dw_clm_cntrl_key
             , concat(to_char(acrd.dw_clm_key),'-',to_char(acrd.Li_num)) as "claim_line_key"
             , acrd.dw_clm_key
@@ -606,56 +622,56 @@ for _,row in to_load.iterrows():
             , acrd.incurd_dt - EXTRACT(DAY from acrd.incurd_dt) + 1 as "incurd_month"
             , acrd.inpat_outpat_cd
             , acrd.HCPCS_CPT_Cd
-            , cpt_code.code_txt as "HCPCS_CPT_Code_Desc"
+            , cpt_code.code_txt as hcpcs_cpt_cd_desc
             , acrd.rvnu_cd
-            , rvcode.code_txt as "RevCD_Desc"
+            , regexp_replace(rvcode.code_txt,' STANDARD ABBREVIATION:.*', '') as rvnu_cd_desc
             , CASE
-             WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvcode.code_txt
-                ELSE cpt_code.code_txt
-            END AS "HCPC_OR_REV_DESC"
-            , diag.code_txt as "prim_diag" -- from acrd.primy_diag_cd
-            , ccs2.diag_desc as "ICD-10-CM Codes Description"
-            , ccs2.CCS_desc as "CCSR Category Description"
-            , clmdrg.drg_cd
-            , drg_codes.BASE_DRG_DESCRIPTION
-            , drg_codes."DRG Description"
-            , clmdrg.maj_diag_cat_cd
-            , drg_codes."MDC Description" as "Major Diagnostic Category (MDC)"
+                 WHEN cpt_code.code_txt is NULL OR cpt_code.code_txt = 'Not Available' THEN rvnu_cd_desc
+                 ELSE cpt_code.code_txt
+            END AS hcpcs_or_rvnu_desc
+            , diag.code_txt as primy_diag_desc -- from acrd.primy_diag_cd
+            , ccs2.diag_desc as icd_10_cm_desc
+            , ccs2.CCS_desc as ccsr_category_desc
+            , drg_mdc.maj_diag_cat_cd
+            --CMS includes a "PRE" category that is not in EDW Code Table
+            , CASE
+                WHEN drg_mdc.maj_diag_cat_cd = 'PRE' THEN 'Pre-MDC'
+                ELSE COALESCE(mdc_desc.CODE_TXT,'No MDC Available')
+              END as maj_diag_cat_desc
+            , drg_mdc.drg_cd
+            , drg_mdc.drg_grpr_vrsn_num
+            , drg_mdc.drg_desc_vrsn_num
+            , COALESCE(REGEXP_SUBSTR(drg_mdc.drg_desc,{base_drg_regex}),drg_mdc.drg_desc) as base_drg_desc
+            , drg_mdc.drg_desc
+            , drg_mdc.drg_medicare_weight
             , acrd.tos_cat_cd
-            , acrd.tos_cat
+            , acrd.tos_cat_desc
             , acrd.pos_cat_cd
-            , acrd.pos_cat
-            --, plcy.FINCL_ARNGMT_CD -- commented out for now. need to solve duplication issues before including if needed in future
-            --, plcy_code.code_txt as FINCL_ARNGMT_CD_Desc
+            , acrd.pos_cat_desc
+            , acrd.er_cat_cd
+            , acrd.er_cat_desc
+            --, plcy.fincl_arngmt_cd -- commented out for now. need to solve duplication issues before including if needed in future
+            --, plcy_code.code_txt as fincl_arngmt_cd_desc
             , acrd.billd_amt
             , acrd.prov_alwd_amt
             , acrd.net_elig_amt
             , acrd.net_elig_rd_amt
             , acrd.net_pd_rd_amt
             , CASE
-                WHEN acrd.net_elig_rd_amt IS NULL then acrd.net_elig_amt
+                WHEN acrd.net_elig_rd_amt IS NULL THEN acrd.net_elig_amt
                 ELSE acrd.net_pd_rd_amt
-            END as Net_Elig_or_RD_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
-            ,acrd.Svc_To_Dt - acrd.Svc_From_Dt as LOS
+            END as net_elig_or_rd_pd -- Is this supposed to be the Allowed or Real Deal amount? Not prov_allwd_amnt
+            , acrd.Svc_To_Dt - acrd.Svc_From_Dt as los
         FROM
-            --- Base RADAR tables ---
             all_claims_with_rd acrd
+
+            -- Additional Diagnosis info. Manual table load by Stefany Goradia.
             LEFT JOIN RADAR.SG_CCS ccs2 on ccs2.diag = acrd.primy_diag_cd -- Code descriptions joined to RADAR views.
 
-            LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
-                and cpt_code.column_name = 'HCPCS_CPT_CD'
-                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
-            LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
-                and diag.column_name = 'DIAG_CD'
-                and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
-            LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
-                and rvcode.column_name = 'RVNU_CD'
-                and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
-
-            --- Base RADAR tables ---
             -- Additional Member Info
             LEFT JOIN mbr_info ON acrd.dw_mbr_key = mbr_info.dw_mbr_key
-    -- Extra policy info.
+
+            -- Extra policy info.
     /*     -- Code block removed until further testing identifies how to join to MBR_PLCY without introducing duplication
                         -- This introduces possibility of duplication of lines where there are multiple active policies for a member
                         -- and the active policies have different FINCL_ARNGMT_CD.
@@ -672,14 +688,26 @@ for _,row in to_load.iterrows():
             -- Additional account info.
             LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.ACCT on acct.dw_acct_key = acrd.dw_acct_key
                 and acct.now_ind = 'Y'
-            -- Currently just getting the DRG Code.
-            LEFT JOIN ENTPRIL_PRD_VIEWS_ALL.CLM_DRG clmdrg ON clmdrg.DW_CLM_KEY = acrd.DW_CLM_KEY
-                and clmdrg.DRG_TYP_CD = 'H'
-            LEFT JOIN drg_codes ON clmdrg.DRG_CD = drg_codes.DRG_CD
 
+            -- MDC & DRG Info
+            LEFT JOIN drg_mdc ON acrd.dw_clm_key = drg_mdc.dw_clm_key
+
+            -- Code Table Joins
+            LEFT JOIN code_table cpt_code on cpt_code.code_cd = acrd.hcpcs_cpt_cd
+                and cpt_code.column_name = 'HCPCS_CPT_CD'
+                and acrd.incurd_dt BETWEEN cpt_code.EFF_DATE and cpt_code.EXP_DATE
+            LEFT JOIN code_table diag on diag.code_cd = acrd.primy_diag_cd
+                and diag.column_name = 'DIAG_CD'
+                and acrd.incurd_dt BETWEEN diag.EFF_DATE and diag.EXP_DATE
+            LEFT JOIN code_table rvcode on rvcode.code_cd = acrd.rvnu_cd
+                and rvcode.column_name = 'RVNU_CD'
+                and acrd.incurd_dt BETWEEN rvcode.EFF_DATE and rvcode.EXP_DATE
+            LEFT JOIN code_table mdc_desc ON mdc_desc.CODE_CD = drg_mdc.maj_diag_cat_cd
+                AND mdc_desc.COLUMN_NAME = 'MAJ_DIAG_CAT_CD'
+                and acrd.incurd_dt BETWEEN mdc_desc.EFF_DATE and mdc_desc.EXP_DATE
                 ;
 '''
-            print(f'loading pfin: {pfin} from {start_date} TO {end_date}')
+            print(f'loading pfin ({i+1}/{total_pfins_to_load}): {pfin} from {start_date} TO {end_date}')
             # Write recipe outputs
             e.query_to_df(query=insert_query)
             start_date = end_date

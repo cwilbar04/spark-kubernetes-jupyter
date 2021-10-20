@@ -1,10 +1,10 @@
 {
-  "type": "Teradata",
-  "managed": true,
+  "type": "UploadedFiles",
+  "managed": false,
+  "formatType": "excel",
   "checklists": {
     "checklists": []
   },
-  "checks": [],
   "customMeta": {
     "kv": {}
   },
@@ -22,47 +22,69 @@
       "rules": []
     }
   },
+  "formatParams": {
+    "xlsx": true,
+    "preserveNumberFormatting": false,
+    "parseDatesToISO": false,
+    "skipRowsBeforeHeader": 0,
+    "parseHeaderRow": true,
+    "skipRowsAfterHeader": 0,
+    "sheets": "*Sheet1"
+  },
   "partitioning": {
     "ignoreNonMatchingFile": false,
     "considerMissingRequestedPartitionsAsEmpty": false,
     "dimensions": []
   },
   "versionTag": {
-    "versionNumber": 2,
+    "versionNumber": 4,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630341543874
+    "lastModifiedOn": 1634329142373
   },
   "creationTag": {
     "versionNumber": 0,
     "lastModifiedBy": {
       "login": "U429930"
     },
-    "lastModifiedOn": 1630339653993
+    "lastModifiedOn": 1634138176375
   },
   "tags": [],
   "params": {
-    "assumedDbTzForUnknownTz": "GMT",
-    "primaryIndexBehavior": "AUTO",
-    "primaryIndexIsUnique": false,
-    "primaryIndexColumns": [],
-    "connection": "PROD_RADAR",
+    "uploadConnection": "Default (in DSS data dir.)",
     "notReadyIfEmpty": false,
-    "mode": "table",
-    "partitioningType": "custom",
-    "normalizeDoubles": true,
-    "table": "radar_contract_monitoring_view_il",
-    "schema": "RADAR_VIEWS",
-    "tableCreationMode": "auto",
-    "writeInsertBatchSize": 10000,
-    "writeJDBCBadDataBehavior": "DISCARD_ROW",
-    "readColsWithUnknownTzAsDates": false,
-    "readSQLDateColsAsDSSDates": true,
-    "assumedTzForUnknownTz": "GMT"
+    "filesSelectionRules": {
+      "mode": "ALL",
+      "excludeRules": [],
+      "includeRules": [],
+      "explicitFiles": []
+    }
   },
   "schema": {
-    "columns": [],
+    "columns": [
+      {
+        "name": "IP_OP",
+        "type": "string"
+      },
+      {
+        "name": "Modeling_Team_Category",
+        "type": "string"
+      },
+      {
+        "name": "Code",
+        "type": "string",
+        "meaning": "Text"
+      },
+      {
+        "name": "Code_Type",
+        "type": "string"
+      },
+      {
+        "name": "Priority",
+        "type": "string"
+      }
+    ],
     "userModified": true
   },
   "metrics": {
@@ -132,6 +154,8 @@
       "columns": [],
       "metrics": [
         "basic:COUNT_COLUMNS",
+        "basic:COUNT_FILES",
+        "basic:SIZE",
         "records:COUNT_RECORDS"
       ]
     }
